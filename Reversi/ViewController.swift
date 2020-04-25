@@ -109,10 +109,10 @@ extension ViewController {
                 location = location.next(to: direction)
                 
                 switch (disk, boardView.disk(at: location)) { // Uses tuples to make patterns exhaustive
-                case (.dark, .some(.dark)), (.light, .some(.light)):
+                case (.dark, .dark), (.light, .light):
                     diskLocations.append(contentsOf: diskLocationsInLine)
                     break flipping
-                case (.dark, .some(.light)), (.light, .some(.dark)):
+                case (.dark, .light), (.light, .dark):
                     diskLocationsInLine.append(location)
                 case (_, .none):
                     break flipping
