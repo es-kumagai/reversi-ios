@@ -10,7 +10,7 @@ public class BoardView: UIView {
     private var actions: [CellSelectionAction] = []
     
     /// セルがタップされたときの挙動を移譲するためのオブジェクトです。
-    public weak var delegate: BoardViewDelegate?
+    weak var delegate: BoardViewDelegate?
     
     override public init(frame: CGRect) {
         
@@ -140,13 +140,6 @@ public class BoardView: UIView {
         }
         cellView.setDisk(disk, animated: animated, completion: completion)
     }
-}
-
-public protocol BoardViewDelegate: AnyObject {
-    /// `boardView` の `location` で指定されるセルがタップされたときに呼ばれます。
-    /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。
-    /// - Parameter location: セルの位置です。
-    func boardView(_ boardView: BoardView, didSelectCellAt location: Location)
 }
 
 private class CellSelectionAction: NSObject {
