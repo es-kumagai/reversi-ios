@@ -28,7 +28,15 @@ class ViewController: UIViewController {
     
     /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
     private var turn: Disk? = .dark
+
+    /// 新しいゲームを始める準備中に `true` になります。
+    private var preparingForNewGame: Bool = false
+
+    private var animationProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
+    private var animationMessageLoopSource: DispatchSourceTimer!
+    private var animationMessageLoopDuration = 0.05
     
+
     private var playerCancellers: [Disk: Canceller] = [:]
     
     override func viewDidLoad() {
@@ -42,9 +50,16 @@ class ViewController: UIViewController {
         } catch _ {
             newGame()
         }
+
+        animationMessageLoopSource =
+        DispatchSource.makeTimerSource(interval: animationMessageLoopDuration, start: true, timerAction: animationMessageLoop)
     }
     
     private var viewHasAppeared: Bool = false
+    
+    func animationMessageLoop() {
+        
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         
@@ -55,6 +70,20 @@ class ViewController: UIViewController {
             self.updateMessageViews()
             self.updateCountLabels()
         }
+        
+        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { notification in
+            
+            self.preparingForNewGame = true
+        }
+
+        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { notification in
+            
+            self.preparingForNewGame = true
+        }
+
+        NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
+        
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -179,7 +208,7 @@ extension ViewController {
                 guard let self = self else { return }
                 
                 self.gameController.set(disk, at: location)
-
+                
                 for location in diskLocations {
                     
                     self.gameController.set(disk, at: location)
@@ -196,18 +225,13 @@ extension ViewController {
         where C.Element == Location
     {
         
-        let duration = 0.5
-        
-        for (offset, location) in locations.enumerated() {
+        for location in locations {
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration * Double(offset)) {
-
-                self.gameController.set(disk, at: location)
-
-                try? self.saveGame()
-                self.updateCountLabels()
-            }
+            gameController.set(disk, at: location)
         }
+
+        try? saveGame()
+        updateCountLabels()
     }
 }
 
@@ -216,7 +240,7 @@ extension ViewController {
 extension ViewController {
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
-
+        
         turn = .dark
         
         for playerControl in playerControls {
@@ -290,7 +314,7 @@ extension ViewController {
             cleanUp()
             
             do {
-
+                
                 try self.placeDisk(turn, at: location, animated: true)
                 self.nextTurn()
             }
@@ -306,6 +330,18 @@ extension ViewController {
 // MARK: Views
 
 extension ViewController {
+    
+    @objc func setDisk(_ notification: Notification) {
+
+        let disk = notification.userInfo!["disk"] as! Disk?
+        let location = notification.userInfo!["location"] as! Location
+                
+        // ゲーム開始の準備時はアニメーションを伴いません。
+        let animated = !preparingForNewGame
+        
+        boardView.set(disk: disk, location: location, animated: animated)
+    }
+
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
@@ -387,7 +423,7 @@ extension ViewController: BoardViewDelegate {
         guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
         do {
-
+            
             try placeDisk(turn, at: location, animated: true)
             nextTurn()
         }

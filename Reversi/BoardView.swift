@@ -5,10 +5,7 @@ private let lineWidth: CGFloat = 2
 public class BoardView: UIView {
     
     @IBOutlet private var gameController: GameController!
-    
-    /// 新しいゲームを始める準備中に `true` になります。
-    private var preparingForNewGame: Bool = false
-    
+        
     private var cellViews: [CellView] = []
     private var actions: [CellSelectionAction] = []
     
@@ -31,17 +28,6 @@ public class BoardView: UIView {
         
         setUp()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
-        
-        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { notification in
-            
-            self.preparingForNewGame = true
-        }
-
-        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { notification in
-            
-            self.preparingForNewGame = true
-        }
     }
 
     private func setUp() {
@@ -120,19 +106,13 @@ public class BoardView: UIView {
     }
 }
 
-private extension BoardView {
+extension BoardView {
     
-    @objc func setDisk(_ notification: Notification) {
+    func set(disk: Disk?, location: Location, animated: Bool) {
 
-        let disk = notification.userInfo!["disk"] as! Disk?
-        let location = notification.userInfo!["location"] as! Location
-        
         guard let cellView = cellView(at: location) else {
             preconditionFailure() // FIXME: Add a message.
         }
-        
-        // ゲーム開始の準備時はアニメーションを伴いません。
-        let animated = !preparingForNewGame
         
         cellView.setDisk(disk, animated: animated)
     }
