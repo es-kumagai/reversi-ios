@@ -6,7 +6,23 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-protocol Player {
+//protocol Player {
+//    
+//    func abortThinking()
+//}
+
+enum Player: Int {
     
-    func abortThinking()
+    case manual = 0
+    case computer = 1
+}
+
+extension Player {
+    
+    /// 次の１手を返します。
+    /// - Returns: マニュアルの場合に nil を返します。
+    func ponderNextMove(handler: (Location?) -> Void) {
+        
+        
+    }
 }

@@ -24,3 +24,33 @@ extension Disk {
         self = flipped
     }
 }
+
+extension Disk : CustomStringConvertible {
+    
+    public var description: String {
+        
+        switch self {
+            
+        case .dark:
+            return "x"
+            
+        case .light:
+            return "o"
+        }
+    }
+    
+    init?(description: String) {
+        
+        switch description {
+            
+        case "x":
+            self = .dark
+            
+        case "o":
+            self = .light
+            
+        default:
+            return nil
+        }
+    }
+}

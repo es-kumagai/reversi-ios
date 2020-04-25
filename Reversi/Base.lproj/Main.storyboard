@@ -195,7 +195,16 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <customObject id="Tcq-mQ-Lh6" customClass="GameController" customModule="Reversi" customModuleProvider="target"/>
+                <customObject id="J0g-2h-x9w" customClass="PlayerController" customModule="Reversi" customModuleProvider="target">
+                    <connections>
+                        <outlet property="gameController" destination="Tcq-mQ-Lh6" id="Kew-92-R6w"/>
+                    </connections>
+                </customObject>
+                <customObject id="Tcq-mQ-Lh6" customClass="GameController" customModule="Reversi" customModuleProvider="target">
+                    <connections>
+                        <outlet property="playerController" destination="J0g-2h-x9w" id="EgM-vw-nAs"/>
+                    </connections>
+                </customObject>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
         </scene>

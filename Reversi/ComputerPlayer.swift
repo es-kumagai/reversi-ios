@@ -6,17 +6,17 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-class ComputerPlayer : Player {
-    
-    var side: Disk
-    
-    init(side: Disk) {
-        
-        self.side = side
-        
-    }
-    
-    func abortThinking() {
-        
-    }
-}
+//class ComputerPlayer : Player {
+//    
+//    var side: Disk
+//    
+//    init(side: Disk) {
+//        
+//        self.side = side
+//        
+//    }
+//    
+//    func abortThinking() {
+//        
+//    }
+//}
