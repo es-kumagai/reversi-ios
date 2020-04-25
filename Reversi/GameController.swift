@@ -8,13 +8,6 @@
 
 import Foundation
 
-extension Notification.Name {
-    
-    static let GameControllerGameWillStart = Notification.Name("GameControllerGameWillStart")
-    static let GameControllerGameDidStart = Notification.Name("GameControllerGameDidStart")
-    static let GameControllerDiskSet = Notification.Name("GameControllerDiskSet")
-}
-
 class GameController : NSObject {
     
     private(set) var board = Board(cols: 8, rows: 8)
@@ -59,7 +52,7 @@ class GameController : NSObject {
     
     func newGame() {
         
-        NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self)
+        delegate?.gameController(self, gameWillStart: ())
         
         for side in Disk.sides {
             playerCancellers[side]?.cancel()
@@ -69,7 +62,7 @@ class GameController : NSObject {
         state = .playing(side: .dark)
         board.reset()
 
-        NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["board" : board])
+        delegate?.gameController(self, gameDidStartWithBoard: board)
     }
     
     func changePlayer(_ player: Player, of side: Disk) {
@@ -114,11 +107,7 @@ class GameController : NSObject {
 
         board[location] = disk
         
-        NotificationCenter.default.post(name: .GameControllerDiskSet, object: self, userInfo: [
-            "disk" : disk as Any,
-            "location" : location,
-            "animationDuration" : duration
-        ])
+        delegate?.gameController(self, setDisk: disk, location: location, animationDuration: duration)
     }
     
     /// 盤上に置かれたディスクの枚数が多い方の色を返します。
@@ -255,7 +244,7 @@ extension GameController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
-            NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: nil)
+            delegate?.gameController(self, gameWillStart: ())
 
             var row = 0
             while let line = lines.popFirst() {
@@ -274,7 +263,7 @@ extension GameController {
                 throw FileIOError.read(path: path, cause: nil)
             }
 
-            NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["board" : board])
+            delegate?.gameController(self, gameDidStartWithBoard: board)
         }
     }
 

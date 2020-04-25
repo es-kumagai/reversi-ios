@@ -56,31 +56,6 @@ class ViewController: UIViewController {
         viewUpdateMessageLoopSource = source
         viewUpdateMessageLoopSource.resume()
         
-        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { [unowned self] notification in
-            
-            self.preparingForNewGame = true
-        }
-
-        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { [unowned self] notification in
-            
-            self.preparingForNewGame = false
-            
-            let board = notification.userInfo!["board"] as! Board
-
-            self.clearViewUpdateRequests()
-            self.updateBoard(board)
-            self.updateMessageViews()
-            self.updateCountLabels()
-            
-            for side in Disk.sides {
-
-                let player = self.gameController.player(of: side)
-                self.playerControls[side.index].selectedSegmentIndex = player.rawValue
-            }
-        }
-
-        NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
-
         do {
             try gameController.loadGame()
         } catch _ {
@@ -160,23 +135,6 @@ extension ViewController {
 // MARK: Views
 
 extension ViewController {
-    
-    @objc func setDisk(_ notification: Notification) {
-
-        let disk = notification.userInfo!["disk"] as! Disk?
-        let location = notification.userInfo!["location"] as! Location
-        let animationDuration = notification.userInfo!["animationDuration"] as! Double
-
-        viewUpdateProcessingQueue.async {
-            
-            self.viewUpdateRequestQueue.enqueue(.square(disk: disk, location: location))
-            
-            if animationDuration != 0 {
-
-                self.viewUpdateRequestQueue.enqueue(.sleep(interval: animationDuration))
-            }
-        }
-    }
 
     /// キューに溜まってる更新リクエストを消去します。
     func clearViewUpdateRequests() {
@@ -325,6 +283,41 @@ extension Disk {
 }
 
 extension ViewController : GameControllerDelegate {
+    
+    func gameController(_ controller: GameController, gameWillStart _: Void) {
+        
+        preparingForNewGame = true
+    }
+    
+    func gameController(_ controller: GameController, gameDidStartWithBoard board: Board) {
+
+        preparingForNewGame = false
+        
+        clearViewUpdateRequests()
+        updateBoard(board)
+        updateMessageViews()
+        updateCountLabels()
+        
+        for side in Disk.sides {
+
+            let player = gameController.player(of: side)
+            playerControls[side.index].selectedSegmentIndex = player.rawValue
+        }
+    }
+    
+    func gameController(_ controller: GameController, setDisk disk: Disk?, location: Location, animationDuration duration: Double) {
+
+        viewUpdateProcessingQueue.async {
+            
+            self.viewUpdateRequestQueue.enqueue(.square(disk: disk, location: location))
+            
+            if duration != 0 {
+
+                self.viewUpdateRequestQueue.enqueue(.sleep(interval: duration))
+            }
+        }
+    }
+    
 
     func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk) {
         
