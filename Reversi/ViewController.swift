@@ -30,11 +30,13 @@ class ViewController: UIViewController {
     private var turn: Disk? = .dark
 
     /// 新しいゲームを始める準備中に `true` になります。
+    private var gameNumber: Int = 0
     private var preparingForNewGame: Bool = false
 
-    private var animationProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
-    private var animationMessageLoopSource: DispatchSourceTimer!
-    private var animationMessageLoopDuration = 0.05
+    private var diskChangeRequestProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
+    private var diskChangeRequestQueue: Queue<DiskChangeRequest> = []
+    private var diskChangeRequestMessageLoopSource: DispatchSourceTimer!
+    private var diskChangeRequestMessageLoopDuration = 0.3
     
 
     private var playerCancellers: [Disk: Canceller] = [:]
@@ -51,14 +53,31 @@ class ViewController: UIViewController {
             newGame()
         }
 
-        animationMessageLoopSource =
-        DispatchSource.makeTimerSource(interval: animationMessageLoopDuration, start: true, timerAction: animationMessageLoop)
+        let source = DispatchSource.makeTimerSource(flags: [], queue: diskChangeRequestProcessingQueue)
+        
+        source.schedule(deadline: .now(), repeating: diskChangeRequestMessageLoopDuration)
+        source.setEventHandler(handler: diskChangeRequestMessageLoop)
+
+        diskChangeRequestMessageLoopSource = source
+        diskChangeRequestMessageLoopSource.resume()
     }
     
     private var viewHasAppeared: Bool = false
     
-    func animationMessageLoop() {
+    func diskChangeRequestMessageLoop() {
         
+        guard let request = diskChangeRequestQueue.dequeue(forGameNumber: gameNumber) else {
+            
+            return
+        }
+        
+        // ゲーム開始の準備時はアニメーションを伴いません。
+        let animated = !preparingForNewGame
+        
+        DispatchQueue.main.async {
+
+            self.boardView.set(disk: request.disk, location: request.location, animated: animated)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -66,24 +85,24 @@ class ViewController: UIViewController {
         super.viewWillAppear(animated)
         
         NotificationCenter.default.addObserver(forName: .GameControllerNewGame, object: nil, queue: nil) { [unowned self] notification in
+
+            self.gameNumber = notification.userInfo!["gameNumber"] as! Int
             
             self.updateMessageViews()
             self.updateCountLabels()
         }
         
-        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { [unowned self] notification in
             
             self.preparingForNewGame = true
         }
 
-        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { [unowned self] notification in
             
             self.preparingForNewGame = true
         }
 
         NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
-        
-
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -335,11 +354,14 @@ extension ViewController {
 
         let disk = notification.userInfo!["disk"] as! Disk?
         let location = notification.userInfo!["location"] as! Location
-                
-        // ゲーム開始の準備時はアニメーションを伴いません。
-        let animated = !preparingForNewGame
+        let gameNumber = notification.userInfo!["gameNumber"] as! Int
+
+        let request = DiskChangeRequest(disk: disk, location: location, gameNumber: gameNumber)
         
-        boardView.set(disk: disk, location: location, animated: animated)
+        diskChangeRequestProcessingQueue.async {
+            
+            self.diskChangeRequestQueue.enqueue(request)
+        }
     }
 
     /// 各プレイヤーの獲得したディスクの枚数を表示します。

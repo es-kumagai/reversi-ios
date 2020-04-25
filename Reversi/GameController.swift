@@ -26,12 +26,13 @@ class GameController : NSObject {
     public func newGame() {
         
         gameNumber += 1
-        notificationCenter.post(name: .GameControllerGameWillStart, object: self, userInfo: ["number" : gameNumber])
+
+        notificationCenter.post(name: .GameControllerNewGame, object: self, userInfo: ["gameNumber" : gameNumber])
+        notificationCenter.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
         
         board.reset()
 
-        notificationCenter.post(name: .GameControllerGameDidStart, object: self, userInfo: ["number" : gameNumber])
-        notificationCenter.post(name: .GameControllerNewGame, object: self, userInfo: ["number" : gameNumber])
+        notificationCenter.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber])
     }
     
     /// `location` で指定された升目の `disk` を参照します。
@@ -66,7 +67,8 @@ class GameController : NSObject {
         
         NotificationCenter.default.post(name: .GameControllerDiskSet, object: self, userInfo: [
             "disk" : disk as Any,
-            "location" : location
+            "location" : location,
+            "gameNumber" : gameNumber
         ])
     }
 }
