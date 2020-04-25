@@ -1,7 +1,13 @@
 import UIKit
 
+extension Notification.Name {
+    
+    static let ViewControllerReset = Notification.Name(rawValue: "ViewControllerReset")
+}
+
 class ViewController: UIViewController {
     
+    private let notificationCenter = NotificationCenter.default
     private let gameController = GameController()
     
     @IBOutlet private var boardView: BoardView!
@@ -23,9 +29,6 @@ class ViewController: UIViewController {
     
     /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
     private var turn: Disk? = .dark
-    
-    private var animationCanceller: Canceller?
-    private var isAnimating: Bool { animationCanceller != nil }
     
     private var playerCancellers: [Disk: Canceller] = [:]
     
@@ -166,16 +169,9 @@ extension ViewController {
         }
         
         if isAnimated {
-            let cleanUp: () -> Void = { [weak self] in
-                self?.animationCanceller = nil
-            }
-            animationCanceller = Canceller(cleanUp)
             animateSettingDisks(at: [location] + diskLocations, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
-                guard let canceller = self.animationCanceller else { return }
-                if canceller.isCancelled { return }
-                cleanUp()
-
+ 
                 completion?(isFinished)
                 try? self.saveGame()
                 self.updateCountLabels()
@@ -206,10 +202,8 @@ extension ViewController {
             return
         }
         
-        let animationCanceller = self.animationCanceller!
         boardView.setDisk(disk, at: location, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
-            if animationCanceller.isCancelled { return }
             if isFinished {
                 self.animateSettingDisks(at: locations.dropFirst(), to: disk, completion: completion)
             } else {
@@ -358,9 +352,6 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
             guard let self = self else { return }
             
-            self.animationCanceller?.cancel()
-            self.animationCanceller = nil
-            
             for side in Disk.sides {
                 self.playerCancellers[side]?.cancel()
                 self.playerCancellers.removeValue(forKey: side)
@@ -368,6 +359,8 @@ extension ViewController {
             
             self.newGame()
             self.waitForPlayer()
+            
+            self.notificationCenter.post(name: .ViewControllerReset, object: self)
         })
         present(alertController, animated: true)
     }
@@ -382,20 +375,18 @@ extension ViewController {
             canceller.cancel()
         }
         
-        if !isAnimating, side == turn, case .computer = Player(rawValue: sender.selectedSegmentIndex)! {
+        if side == turn, case .computer = Player(rawValue: sender.selectedSegmentIndex)! {
             playTurnOfComputer()
         }
     }
 }
 
 extension ViewController: BoardViewDelegate {
-    /// `boardView` の `x`, `y` で指定されるセルがタップされたときに呼ばれます。
+    /// `boardView` の `location` で指定されるセルがタップされたときに呼ばれます。
     /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
+    /// - Parameter location: セルの位置です。
     func boardView(_ boardView: BoardView, didSelectCellAt location: Location) {
         guard let turn = turn else { return }
-        if isAnimating { return }
         guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, at: location, animated: true) { [weak self] _ in
