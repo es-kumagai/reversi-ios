@@ -35,8 +35,11 @@ class ViewController: UIViewController {
     private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
     private var viewUpdateRequestQueue: Queue<ViewUpdateRequest> = []
     private var viewUpdateMessageLoopSource: DispatchSourceTimer!
-    private var viewUpdateMessageLoopDuration = 0.3
+    private var viewUpdateMessageLoopDuration = 0.02
+    private var viewUpdateMessageLoopSleepCount = 0 as Double
     
+    private var animationDuration = 0.3
+
 
     private var playerCancellers: [Disk: Canceller] = [:]
     
@@ -84,6 +87,12 @@ class ViewController: UIViewController {
     
     func diskChangeRequestMessageLoop() {
         
+        guard viewUpdateMessageLoopSleepCount == 0 else {
+        
+            viewUpdateMessageLoopSleepCount = max(viewUpdateMessageLoopSleepCount - 1, 0)
+            return
+        }
+        
         guard let request = viewUpdateRequestQueue.dequeue() else {
             
             return
@@ -101,6 +110,9 @@ class ViewController: UIViewController {
                 
             case .board(board: let board):
                 self.boardView.set(board: board, animated: animated)
+                
+            case .sleep(interval: let interval):
+                self.viewUpdateMessageLoopSleepCount = interval / self.viewUpdateMessageLoopDuration
             }
         }
     }
@@ -208,41 +220,21 @@ extension ViewController {
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool) throws {
-        let diskLocations = flippedDiskLocationsByPlacingDisk(disk, at: location)
-        if diskLocations.isEmpty {
+        
+        let flipLocations = flippedDiskLocationsByPlacingDisk(disk, at: location)
+
+        guard !flipLocations.isEmpty else {
             throw DiskPlacementError(disk: disk, location: location)
         }
         
-        if isAnimated {
-            animateSettingDisks(at: [location] + diskLocations, to: disk)
-        } else {
-            
-            gameController.set(disk, at: location)
-            
-            for location in diskLocations {
-                
-                gameController.set(disk, at: location)
-                
-            }
+        let locations = [location] + flipLocations
+        let duration = isAnimated ? animationDuration : 0
 
-            try? saveGame()
-            updateCountLabels()
-        }
-    }
-    
-    /// `locations` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
-    /// `locations` から先頭の座標を取得してそのセルに `disk` を置き、
-    /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
-    /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
-    private func animateSettingDisks<C: Collection>(at locations: C, to disk: Disk)
-        where C.Element == Location
-    {
-        
         for location in locations {
-            
-            gameController.set(disk, at: location)
-        }
 
+            gameController.set(disk, at: location, animationDuration: duration)
+        }
+        
         try? saveGame()
         updateCountLabels()
     }
@@ -348,12 +340,16 @@ extension ViewController {
 
         let disk = notification.userInfo!["disk"] as! Disk?
         let location = notification.userInfo!["location"] as! Location
+        let animationDuration = notification.userInfo!["animationDuration"] as! Double
 
-        let request = ViewUpdateRequest.square(disk: disk, location: location)
-        
         viewUpdateProcessingQueue.async {
             
-            self.viewUpdateRequestQueue.enqueue(request)
+            self.viewUpdateRequestQueue.enqueue(.square(disk: disk, location: location))
+            
+            if animationDuration != 0 {
+
+                self.viewUpdateRequestQueue.enqueue(.sleep(interval: animationDuration))
+            }
         }
     }
 
@@ -363,6 +359,7 @@ extension ViewController {
         viewUpdateProcessingQueue.async {
             
             self.viewUpdateRequestQueue.clear()
+            self.viewUpdateMessageLoopSleepCount = 0
         }
     }
     
@@ -541,7 +538,7 @@ extension ViewController {
                 var col = 0
                 for character in line {
                     let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    gameController.set(disk, at: Location(col: col, row: row))
+                    gameController.set(disk, at: Location(col: col, row: row), animationDuration: 0)
                     col += 1
                 }
                 guard col == gameController.board.cols else {

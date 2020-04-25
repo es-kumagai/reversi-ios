@@ -10,4 +10,5 @@ enum ViewUpdateRequest {
     
     case square(disk: Disk?, location: Location)
     case board(board: Board)
+    case sleep(interval: Double)
 }

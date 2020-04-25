@@ -44,7 +44,8 @@ class GameController : NSObject {
     /// `location` で指定された升目に `disk` を設定します。
     /// - Parameter disk: 升目に設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
     /// - Parameter location: セルの位置です。
-    func set(_ disk: Disk?, at location: Location) {
+    /// - Parameter animationDuration: アニメーション表示時の待ち時間です。
+    func set(_ disk: Disk?, at location: Location, animationDuration duration: Double) {
         
         guard board.contains(location) else {
             
@@ -60,7 +61,8 @@ class GameController : NSObject {
         
         NotificationCenter.default.post(name: .GameControllerDiskSet, object: self, userInfo: [
             "disk" : disk as Any,
-            "location" : location
+            "location" : location,
+            "animationDuration" : duration
         ])
     }
 }
