@@ -8,6 +8,7 @@
 
 enum ViewUpdateRequest {
     
+
     case square(gameNumber: Int, disk: Disk?, location: Location)
     case board(gameNumber: Int, board: Board)
 }

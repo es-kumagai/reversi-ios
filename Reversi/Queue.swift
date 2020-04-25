@@ -54,6 +54,11 @@ public struct Queue<Element> : ExpressibleByArrayLiteral {
         
         return elements.count
     }
+    
+    public mutating func clear() {
+        
+        elements.removeAll()
+    }
 }
 
 extension Queue : Sequence {

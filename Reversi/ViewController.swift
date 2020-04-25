@@ -67,6 +67,7 @@ class ViewController: UIViewController {
             
             let board = notification.userInfo!["board"] as! Board
 
+            self.clearViewUpdateRequests()
             self.updateBoard(board)
             self.updateMessageViews()
             self.updateCountLabels()
@@ -97,7 +98,7 @@ class ViewController: UIViewController {
             
             switch request {
                 
-            case .square(_, let disk, let location):
+            case .square(gameNumber: _, disk: let disk, location: let location):
                 self.boardView.set(disk: disk, location: location, animated: animated)
                 
             case .board(gameNumber: _, board: let board):
@@ -217,16 +218,17 @@ extension ViewController {
         if isAnimated {
             animateSettingDisks(at: [location] + diskLocations, to: disk)
         } else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+            
+            gameController.set(disk, at: location)
+            
+            for location in diskLocations {
                 
-                self.gameController.set(disk, at: location)
+                gameController.set(disk, at: location)
                 
-                for location in diskLocations {
-                    
-                    self.gameController.set(disk, at: location)
-                }
             }
+
+            try? saveGame()
+            updateCountLabels()
         }
     }
     
@@ -358,6 +360,15 @@ extension ViewController {
         }
     }
 
+    /// キューに溜まってる更新リクエストを消去します。
+    func clearViewUpdateRequests() {
+    
+        viewUpdateProcessingQueue.async {
+            
+            self.viewUpdateRequestQueue.clear()
+        }
+    }
+    
     /// 盤面を一括で更新します。
     func updateBoard(_ board: Board) {
         
@@ -368,7 +379,7 @@ extension ViewController {
             self.viewUpdateRequestQueue.enqueue(request)
         }
     }
-
+    
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
