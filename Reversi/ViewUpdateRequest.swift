@@ -6,11 +6,10 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-struct ViewUpdateRequest {
+enum ViewUpdateRequest {
     
-    var disk: Disk?
-    var location: Location
-    var gameNumber: Int
+    case square(gameNumber: Int, disk: Disk?, location: Location)
+    case board(gameNumber: Int, board: Board)
 }
 
 extension Queue where Element == ViewUpdateRequest {
@@ -19,11 +18,19 @@ extension Queue where Element == ViewUpdateRequest {
     /// それ以外のゲーム用のリクエストは捨てられます。
     /// - Parameter number: 目的のゲーム番号です。
     /// - Returns: 指定されたゲーム用の最初に見つかったリクエストです。
-    mutating func dequeue(forGameNumber number: Int) -> Element? {
+    mutating func dequeue(forGameNumber gameNumber: Int) -> Element? {
     
-        while let element = dequeue(), element.gameNumber == number {
+        while let element = dequeue() {
             
-            return element
+            switch element {
+                
+            case .square(gameNumber: gameNumber, disk: _, location: _),
+                 .board(gameNumber: gameNumber, _):
+                return element
+                
+            default:
+                continue
+            }
         }
         
         return nil

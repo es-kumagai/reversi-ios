@@ -10,7 +10,6 @@ import Foundation
 
 extension Notification.Name {
     
-    static let GameControllerNewGame = Notification.Name("GameControllerNewGame")
     static let GameControllerGameWillStart = Notification.Name("GameControllerGameWillStart")
     static let GameControllerGameDidStart = Notification.Name("GameControllerGameDidStart")
     static let GameControllerDiskSet = Notification.Name("GameControllerDiskSet")
@@ -19,7 +18,6 @@ extension Notification.Name {
 class GameController : NSObject {
     
     private(set) var gameNumber = 0
-    private let notificationCenter = NotificationCenter.default
     
     private(set) var board = Board(cols: 8, rows: 8)
     
@@ -27,12 +25,11 @@ class GameController : NSObject {
         
         gameNumber += 1
 
-        notificationCenter.post(name: .GameControllerNewGame, object: self, userInfo: ["gameNumber" : gameNumber])
-        notificationCenter.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
+        NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
         
         board.reset()
 
-        notificationCenter.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber])
+        NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber, "board" : board])
     }
     
     /// `location` で指定された升目の `disk` を参照します。

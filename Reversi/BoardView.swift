@@ -116,6 +116,14 @@ extension BoardView {
         
         cellView.setDisk(disk, animated: animated)
     }
+    
+    func set(board: Board, animated: Bool) {
+        
+        for square in board.squares {
+            
+            set(disk: square.disk, location: square.location, animated: animated)
+        }
+    }
 }
 
 private class CellSelectionAction: NSObject {

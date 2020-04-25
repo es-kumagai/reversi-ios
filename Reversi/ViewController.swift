@@ -33,10 +33,10 @@ class ViewController: UIViewController {
     private var gameNumber: Int = 0
     private var preparingForNewGame: Bool = false
 
-    private var diskChangeRequestProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
-    private var diskChangeRequestQueue: Queue<DiskChangeRequest> = []
-    private var diskChangeRequestMessageLoopSource: DispatchSourceTimer!
-    private var diskChangeRequestMessageLoopDuration = 0.3
+    private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
+    private var viewUpdateRequestQueue: Queue<ViewUpdateRequest> = []
+    private var viewUpdateMessageLoopSource: DispatchSourceTimer!
+    private var viewUpdateMessageLoopDuration = 0.3
     
 
     private var playerCancellers: [Disk: Canceller] = [:]
@@ -47,50 +47,13 @@ class ViewController: UIViewController {
         boardView.delegate = self
         messageDiskSize = messageDiskSizeConstraint.constant
         
-        do {
-            try loadGame()
-        } catch _ {
-            newGame()
-        }
-
-        let source = DispatchSource.makeTimerSource(flags: [], queue: diskChangeRequestProcessingQueue)
+        let source = DispatchSource.makeTimerSource(flags: [], queue: viewUpdateProcessingQueue)
         
-        source.schedule(deadline: .now(), repeating: diskChangeRequestMessageLoopDuration)
+        source.schedule(deadline: .now(), repeating: viewUpdateMessageLoopDuration)
         source.setEventHandler(handler: diskChangeRequestMessageLoop)
 
-        diskChangeRequestMessageLoopSource = source
-        diskChangeRequestMessageLoopSource.resume()
-    }
-    
-    private var viewHasAppeared: Bool = false
-    
-    func diskChangeRequestMessageLoop() {
-        
-        guard let request = diskChangeRequestQueue.dequeue(forGameNumber: gameNumber) else {
-            
-            return
-        }
-        
-        // ゲーム開始の準備時はアニメーションを伴いません。
-        let animated = !preparingForNewGame
-        
-        DispatchQueue.main.async {
-
-            self.boardView.set(disk: request.disk, location: request.location, animated: animated)
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        super.viewWillAppear(animated)
-        
-        NotificationCenter.default.addObserver(forName: .GameControllerNewGame, object: nil, queue: nil) { [unowned self] notification in
-
-            self.gameNumber = notification.userInfo!["gameNumber"] as! Int
-            
-            self.updateMessageViews()
-            self.updateCountLabels()
-        }
+        viewUpdateMessageLoopSource = source
+        viewUpdateMessageLoopSource.resume()
         
         NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { [unowned self] notification in
             
@@ -99,17 +62,60 @@ class ViewController: UIViewController {
 
         NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { [unowned self] notification in
             
-            self.preparingForNewGame = true
+            self.preparingForNewGame = false
+            self.gameNumber = notification.userInfo!["gameNumber"] as! Int
+            
+            let board = notification.userInfo!["board"] as! Board
+
+            self.updateBoard(board)
+            self.updateMessageViews()
+            self.updateCountLabels()
         }
 
         NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
+
+        do {
+            try loadGame()
+        } catch _ {
+            newGame()
+        }
+    }
+    
+    private var viewHasAppeared: Bool = false
+    
+    func diskChangeRequestMessageLoop() {
+        
+        guard let request = viewUpdateRequestQueue.dequeue(forGameNumber: gameNumber) else {
+            
+            return
+        }
+        
+        // ゲーム開始の準備時はアニメーションを伴いません。
+        let animated = !preparingForNewGame
+        
+        DispatchQueue.main.async {
+            
+            switch request {
+                
+            case .square(_, let disk, let location):
+                self.boardView.set(disk: disk, location: location, animated: animated)
+                
+            case .board(gameNumber: _, board: let board):
+                self.boardView.set(board: board, animated: animated)
+            }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        super.viewWillAppear(animated)
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         
         super.viewDidDisappear(animated)
         
-        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -356,11 +362,22 @@ extension ViewController {
         let location = notification.userInfo!["location"] as! Location
         let gameNumber = notification.userInfo!["gameNumber"] as! Int
 
-        let request = DiskChangeRequest(disk: disk, location: location, gameNumber: gameNumber)
+        let request = ViewUpdateRequest.square(gameNumber: gameNumber, disk: disk, location: location)
         
-        diskChangeRequestProcessingQueue.async {
+        viewUpdateProcessingQueue.async {
             
-            self.diskChangeRequestQueue.enqueue(request)
+            self.viewUpdateRequestQueue.enqueue(request)
+        }
+    }
+
+    /// 盤面を一括で更新します。
+    func updateBoard(_ board: Board) {
+        
+        let request = ViewUpdateRequest.board(gameNumber: gameNumber, board: board)
+        
+        viewUpdateProcessingQueue.async {
+            
+            self.viewUpdateRequestQueue.enqueue(request)
         }
     }
 
@@ -521,6 +538,8 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
+            NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
+
             var row = 0
             while let line = lines.popFirst() {
                 var col = 0
@@ -537,6 +556,8 @@ extension ViewController {
             guard row == gameController.board.rows else {
                 throw FileIOError.read(path: path, cause: nil)
             }
+
+            NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber, "board" : gameController.board])
         }
         
         updateMessageViews()
