@@ -1,6 +1,9 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    private let gameController = GameController()
+    
     @IBOutlet private var boardView: BoardView!
     
     @IBOutlet private var messageDiskView: DiskView!
@@ -235,6 +238,7 @@ extension ViewController {
         updateCountLabels()
         
         try? saveGame()
+        gameController.newGame()
     }
     
     /// プレイヤーの行動を待ちます。
