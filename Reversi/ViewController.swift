@@ -7,7 +7,6 @@ extension Notification.Name {
 
 class ViewController: UIViewController {
     
-    private let notificationCenter = NotificationCenter.default
     @IBOutlet private var gameController: GameController!
     
     @IBOutlet private var boardView: BoardView!
@@ -46,6 +45,25 @@ class ViewController: UIViewController {
     }
     
     private var viewHasAppeared: Bool = false
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(forName: .GameControllerNewGame, object: nil, queue: nil) { [unowned self] notification in
+            
+            self.updateMessageViews()
+            self.updateCountLabels()
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -62,16 +80,10 @@ extension ViewController {
     /// - Parameter side: 数えるディスクの色です。
     /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
     func countDisks(of side: Disk) -> Int {
-        var count = 0
         
-        for square in gameController.board.squares {
-            if boardView.disk(at: square.location) == side {
-                count +=  1
-                
-            }
-        }
-        
-        return count
+        return gameController.board.squares
+            .filter { $0.disk == side }
+            .count
     }
     
     /// 盤上に置かれたディスクの枚数が多い方の色を返します。
@@ -89,7 +101,7 @@ extension ViewController {
     
     private func flippedDiskLocationsByPlacingDisk(_ disk: Disk, at location: Location) -> [Location] {
         
-        guard boardView.disk(at: location) == nil else {
+        guard gameController.disk(at: location) == nil else {
             return []
         }
         
@@ -101,9 +113,15 @@ extension ViewController {
             var diskLocationsInLine: [Location] = []
             
             flipping: while true {
+                
                 location = location.next(to: direction)
                 
-                switch (disk, boardView.disk(at: location)) { // Uses tuples to make patterns exhaustive
+                guard gameController.board.contains(location) else {
+                    
+                    break flipping
+                }
+                
+                switch (disk, gameController.disk(at: location)) { // Uses tuples to make patterns exhaustive
                 case (.dark, .dark), (.light, .light):
                     diskLocations.append(contentsOf: diskLocationsInLine)
                     break flipping
@@ -148,30 +166,24 @@ extension ViewController {
     ///     このクロージャは値を返さず、アニメーションが完了したかを示す真偽値を受け取ります。
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
-    func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
+    func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool) throws {
         let diskLocations = flippedDiskLocationsByPlacingDisk(disk, at: location)
         if diskLocations.isEmpty {
             throw DiskPlacementError(disk: disk, location: location)
         }
         
         if isAnimated {
-            animateSettingDisks(at: [location] + diskLocations, to: disk) { [weak self] isFinished in
-                guard let self = self else { return }
-                
-                completion?(isFinished)
-                try? self.saveGame()
-                self.updateCountLabels()
-            }
+            animateSettingDisks(at: [location] + diskLocations, to: disk)
         } else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.boardView.setDisk(disk, at: location, animated: false)
+                
+                self.gameController.set(disk, at: location)
+
                 for location in diskLocations {
-                    self.boardView.setDisk(disk, at: location, animated: false)
+                    
+                    self.gameController.set(disk, at: location)
                 }
-                completion?(true)
-                try? self.saveGame()
-                self.updateCountLabels()
             }
         }
     }
@@ -180,23 +192,20 @@ extension ViewController {
     /// `locations` から先頭の座標を取得してそのセルに `disk` を置き、
     /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
     /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
-    private func animateSettingDisks<C: Collection>(at locations: C, to disk: Disk, completion: @escaping (Bool) -> Void)
+    private func animateSettingDisks<C: Collection>(at locations: C, to disk: Disk)
         where C.Element == Location
     {
-        guard let location = locations.first else {
-            completion(true)
-            return
-        }
         
-        boardView.setDisk(disk, at: location, animated: true) { [weak self] isFinished in
-            guard let self = self else { return }
-            if isFinished {
-                self.animateSettingDisks(at: locations.dropFirst(), to: disk, completion: completion)
-            } else {
-                for location in locations {
-                    self.boardView.setDisk(disk, at: location, animated: false)
-                }
-                completion(false)
+        let duration = 0.5
+        
+        for (offset, location) in locations.enumerated() {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration * Double(offset)) {
+
+                self.gameController.set(disk, at: location)
+
+                try? self.saveGame()
+                self.updateCountLabels()
             }
         }
     }
@@ -207,15 +216,12 @@ extension ViewController {
 extension ViewController {
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
-        boardView.reset()
+
         turn = .dark
         
         for playerControl in playerControls {
             playerControl.selectedSegmentIndex = Player.manual.rawValue
         }
-        
-        updateMessageViews()
-        updateCountLabels()
         
         try? saveGame()
         gameController.newGame()
@@ -283,8 +289,13 @@ extension ViewController {
             if canceller.isCancelled { return }
             cleanUp()
             
-            try! self.placeDisk(turn, at: location, animated: true) { [weak self] _ in
-                self?.nextTurn()
+            do {
+
+                try self.placeDisk(turn, at: location, animated: true)
+                self.nextTurn()
+            }
+            catch _ {
+                
             }
         }
         
@@ -346,7 +357,7 @@ extension ViewController {
             self.newGame()
             self.waitForPlayer()
             
-            self.notificationCenter.post(name: .ViewControllerReset, object: self)
+            NotificationCenter.default.post(name: .ViewControllerReset, object: self)
         })
         present(alertController, animated: true)
     }
@@ -375,8 +386,13 @@ extension ViewController: BoardViewDelegate {
         guard let turn = turn else { return }
         guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
-        try? placeDisk(turn, at: location, animated: true) { [weak self] _ in
-            self?.nextTurn()
+        do {
+
+            try placeDisk(turn, at: location, animated: true)
+            nextTurn()
+        }
+        catch _ {
+            
         }
     }
 }
@@ -399,7 +415,7 @@ extension ViewController {
         
         for squaresPerRow in gameController.board.squaresPerRow {
             for square in squaresPerRow {
-                output += boardView.disk(at: square.location).symbol
+                output += square.disk.symbol
             }
             output += "\n"
         }
@@ -452,7 +468,7 @@ extension ViewController {
                 var col = 0
                 for character in line {
                     let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    boardView.setDisk(disk, at: Location(col: col, row: row), animated: false)
+                    gameController.set(disk, at: Location(col: col, row: row))
                     col += 1
                 }
                 guard col == gameController.board.cols else {

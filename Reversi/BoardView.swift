@@ -6,6 +6,9 @@ public class BoardView: UIView {
     
     @IBOutlet private var gameController: GameController!
     
+    /// 新しいゲームを始める準備中に `true` になります。
+    private var preparingForNewGame: Bool = false
+    
     private var cellViews: [CellView] = []
     private var actions: [CellSelectionAction] = []
     
@@ -27,6 +30,18 @@ public class BoardView: UIView {
         super.awakeFromNib()
         
         setUp()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(setDisk(_:)), name: .GameControllerDiskSet, object: nil)
+        
+        NotificationCenter.default.addObserver(forName: .GameControllerGameWillStart, object: nil, queue: nil) { notification in
+            
+            self.preparingForNewGame = true
+        }
+
+        NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { notification in
+            
+            self.preparingForNewGame = true
+        }
     }
 
     private func setUp() {
@@ -87,7 +102,7 @@ public class BoardView: UIView {
             }
         }
         
-        reset()
+//        reset()
         
         for square in gameController.board.squares {
             let location = square.location
@@ -97,48 +112,29 @@ public class BoardView: UIView {
             cellView.addTarget(action, action: #selector(action.selectCell), for: .touchUpInside)
         }
     }
-    
-    /// 盤をゲーム開始時に状態に戻します。このメソッドはアニメーションを伴いません。
-    // NOTE: アニメが伴っても良いのではないか？
-    public func reset() {
-        for square in gameController.board.squares {
-            setDisk(nil, at: square.location, animated: false)
-        }
         
-        setDisk(.light, at: Location(col: gameController.board.cols / 2 - 1, row: gameController.board.rows / 2 - 1), animated: false)
-        setDisk(.dark, at: Location(col: gameController.board.cols / 2, row: gameController.board.rows / 2 - 1), animated: false)
-        setDisk(.dark, at: Location(col: gameController.board.cols / 2 - 1, row: gameController.board.rows / 2), animated: false)
-        setDisk(.light, at: Location(col: gameController.board.cols / 2, row: gameController.board.rows / 2), animated: false)
-    }
-    
     private func cellView(at location: Location) -> CellView? {
         
         guard gameController.board.contains(location) else { return nil }
         return cellViews[location.col * gameController.board.cols + location.row]
     }
+}
+
+private extension BoardView {
     
-    /// `location` で指定されたセルの状態を返します。
-    /// セルにディスクが置かれていない場合、 `nil` が返されます。
-    /// - Parameter location: セルの位置です。
-    /// - Returns: セルにディスクが置かれている場合はそのディスクの値を、置かれていない場合は `nil` を返します。
-    public func disk(at location: Location) -> Disk? {
-        cellView(at: location)?.disk
-    }
-    
-    /// `location` で指定されたセルの状態を、与えられた `disk` に変更します。
-    /// `animated` が `true` の場合、アニメーションが実行されます。
-    /// アニメーションの完了通知は `completion` ハンドラーで受け取ることができます。
-    /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
-    /// - Parameter location: セルの位置です。
-    /// - Parameter animated: セルの状態変更を表すアニメーションを表示するかどうかを指定します。
-    /// - Parameter completion: アニメーションの完了通知を受け取るハンドラーです。
-    ///     `animated` に `false` が指定された場合は状態が変更された後で即座に同期的に呼び出されます。
-    ///     ハンドラーが受け取る `Bool` 値は、 `UIView.animate()`  等に準じます。
-    public func setDisk(_ disk: Disk?, at location: Location, animated: Bool, completion: ((Bool) -> Void)? = nil) {
+    @objc func setDisk(_ notification: Notification) {
+
+        let disk = notification.userInfo!["disk"] as! Disk?
+        let location = notification.userInfo!["location"] as! Location
+        
         guard let cellView = cellView(at: location) else {
             preconditionFailure() // FIXME: Add a message.
         }
-        cellView.setDisk(disk, animated: animated, completion: completion)
+        
+        // ゲーム開始の準備時はアニメーションを伴いません。
+        let animated = !preparingForNewGame
+        
+        cellView.setDisk(disk, animated: animated)
     }
 }
 

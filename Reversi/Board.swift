@@ -6,6 +6,8 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
+import Foundation
+
 struct Board {
     
     let cols: Int
@@ -30,11 +32,19 @@ struct Board {
     }
 }
 
-extension Board {
+private extension Board {
+    
+    func squareIndex(of location: Location) -> Int {
+        
+        return location.row * rows + location.col
+    }
+}
 
+extension Board {
+    
     /// 盤上の升目の数です。
     var squareCount: Int {
-    
+        
         return cols * rows
     }
     
@@ -44,7 +54,7 @@ extension Board {
         var result: [[Square]] = []
         
         for row in 0 ..< rows {
-        
+            
             let squaresAtRow = squares.filter { $0.location.row == row }
             
             result.append(squaresAtRow)
@@ -53,6 +63,35 @@ extension Board {
         return result
     }
     
+    /// `location` で指定された升目に `disk` を設定します。
+    /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
+    /// - Parameter location: セルの位置です。
+    subscript(_ location: Location) -> Disk? {
+        
+        get {
+            
+            return squares[squareIndex(of: location)].disk
+        }
+        
+        set (disk) {
+
+            squares[squareIndex(of: location)].disk = disk
+        }
+    }
+    
+    /// 盤をゲーム開始時に状態に戻します。
+    mutating func reset() {
+        
+        for square in squares {
+            
+            self[square.location] = nil
+        }
+        
+        self[Location(col: cols / 2 - 1, row: rows / 2 - 1)] = .light
+        self[Location(col: cols / 2, row: rows / 2 - 1)] = .dark
+        self[Location(col: cols / 2 - 1, row: rows / 2)] = .dark
+        self[Location(col: cols / 2, row: rows / 2)] = .light
+    }
     
     /// `location` が盤上に収まるかを調べます。
     /// - Parameter location: 盤の位置
