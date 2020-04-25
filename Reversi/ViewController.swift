@@ -58,9 +58,9 @@ extension ViewController {
     func countDisks(of side: Disk) -> Int {
         var count = 0
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                if boardView.diskAt(x: x, y: y) == side {
+        for row in boardView.yRange {
+            for col in boardView.xRange {
+                if boardView.disk(at: Location(col: col, row: row)) == side {
                     count +=  1
                 }
             }
@@ -82,7 +82,7 @@ extension ViewController {
         }
     }
     
-    private func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [(Int, Int)] {
+    private func flippedDiskLocationsByPlacingDisk(_ disk: Disk, at location: Location) -> [Location] {
         let directions = [
             (x: -1, y: -1),
             (x:  0, y: -1),
@@ -94,73 +94,74 @@ extension ViewController {
             (x: -1, y:  1),
         ]
         
-        guard boardView.diskAt(x: x, y: y) == nil else {
+        guard boardView.disk(at: location) == nil else {
             return []
         }
         
-        var diskCoordinates: [(Int, Int)] = []
+        var diskLocations: [Location] = []
         
         for direction in directions {
-            var x = x
-            var y = y
+            var col = location.col
+            var row = location.row
             
-            var diskCoordinatesInLine: [(Int, Int)] = []
+            var diskLocationsInLine: [Location] = []
             flipping: while true {
-                x += direction.x
-                y += direction.y
+                col += direction.x
+                row += direction.y
                 
-                switch (disk, boardView.diskAt(x: x, y: y)) { // Uses tuples to make patterns exhaustive
+                let location = Location(col: col, row: row)
+                switch (disk, boardView.disk(at: location)) { // Uses tuples to make patterns exhaustive
                 case (.dark, .some(.dark)), (.light, .some(.light)):
-                    diskCoordinates.append(contentsOf: diskCoordinatesInLine)
+                    diskLocations.append(contentsOf: diskLocationsInLine)
                     break flipping
                 case (.dark, .some(.light)), (.light, .some(.dark)):
-                    diskCoordinatesInLine.append((x, y))
+                    diskLocationsInLine.append(location)
                 case (_, .none):
                     break flipping
                 }
             }
         }
         
-        return diskCoordinates
+        return diskLocations
     }
     
     /// `x`, `y` で指定されたセルに、 `disk` が置けるかを調べます。
     /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
-    /// - Parameter x: セルの列です。
+    /// - Parameter location: セルの位置です。
     /// - Parameter y: セルの行です。
     /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
-    func canPlaceDisk(_ disk: Disk, atX x: Int, y: Int) -> Bool {
-        !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).isEmpty
+    func canPlaceDisk(_ disk: Disk, at location: Location) -> Bool {
+        !flippedDiskLocationsByPlacingDisk(disk, at: location).isEmpty
     }
     
     /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
     /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
-    func validMoves(for side: Disk) -> [(x: Int, y: Int)] {
-        var coordinates: [(Int, Int)] = []
+    func validMoves(for side: Disk) -> [Location] {
+        var locations: [Location] = []
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                if canPlaceDisk(side, atX: x, y: y) {
-                    coordinates.append((x, y))
+        for row in boardView.yRange {
+            for col in boardView.xRange {
+                let location = Location(col: col, row: row)
+                if canPlaceDisk(side, at: location) {
+                    locations.append(location)
                 }
             }
         }
         
-        return coordinates
+        return locations
     }
 
     /// `x`, `y` で指定されたセルに `disk` を置きます。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
+    /// - Parameter location: セルの位置です。
     /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
     /// - Parameter completion: アニメーション完了時に実行されるクロージャです。
     ///     このクロージャは値を返さず、アニメーションが完了したかを示す真偽値を受け取ります。
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
-    /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
-    func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
-        let diskCoordinates = flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
-        if diskCoordinates.isEmpty {
-            throw DiskPlacementError(disk: disk, x: x, y: y)
+    /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
+    func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
+        let diskLocations = flippedDiskLocationsByPlacingDisk(disk, at: location)
+        if diskLocations.isEmpty {
+            throw DiskPlacementError(disk: disk, location: location)
         }
         
         if isAnimated {
@@ -168,7 +169,7 @@ extension ViewController {
                 self?.animationCanceller = nil
             }
             animationCanceller = Canceller(cleanUp)
-            animateSettingDisks(at: [(x, y)] + diskCoordinates, to: disk) { [weak self] isFinished in
+            animateSettingDisks(at: [location] + diskLocations, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
                 guard let canceller = self.animationCanceller else { return }
                 if canceller.isCancelled { return }
@@ -181,9 +182,9 @@ extension ViewController {
         } else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.boardView.setDisk(disk, atX: x, y: y, animated: false)
-                for (x, y) in diskCoordinates {
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                self.boardView.setDisk(disk, at: location, animated: false)
+                for location in diskLocations {
+                    self.boardView.setDisk(disk, at: location, animated: false)
                 }
                 completion?(true)
                 try? self.saveGame()
@@ -192,27 +193,27 @@ extension ViewController {
         }
     }
     
-    /// `coordinates` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
-    /// `coordinates` から先頭の座標を取得してそのセルに `disk` を置き、
+    /// `locations` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
+    /// `locations` から先頭の座標を取得してそのセルに `disk` を置き、
     /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
     /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
-    private func animateSettingDisks<C: Collection>(at coordinates: C, to disk: Disk, completion: @escaping (Bool) -> Void)
-        where C.Element == (Int, Int)
+    private func animateSettingDisks<C: Collection>(at locations: C, to disk: Disk, completion: @escaping (Bool) -> Void)
+        where C.Element == Location
     {
-        guard let (x, y) = coordinates.first else {
+        guard let location = locations.first else {
             completion(true)
             return
         }
         
         let animationCanceller = self.animationCanceller!
-        boardView.setDisk(disk, atX: x, y: y, animated: true) { [weak self] isFinished in
+        boardView.setDisk(disk, at: location, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
             if animationCanceller.isCancelled { return }
             if isFinished {
-                self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
+                self.animateSettingDisks(at: locations.dropFirst(), to: disk, completion: completion)
             } else {
-                for (x, y) in coordinates {
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                for location in locations {
+                    self.boardView.setDisk(disk, at: location, animated: false)
                 }
                 completion(false)
             }
@@ -285,7 +286,7 @@ extension ViewController {
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
         guard let turn = self.turn else { preconditionFailure() }
-        let (x, y) = validMoves(for: turn).randomElement()!
+        let location = validMoves(for: turn).randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
         
@@ -300,7 +301,7 @@ extension ViewController {
             if canceller.isCancelled { return }
             cleanUp()
             
-            try! self.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+            try! self.placeDisk(turn, at: location, animated: true) { [weak self] _ in
                 self?.nextTurn()
             }
         }
@@ -390,12 +391,12 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
-    func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int) {
+    func boardView(_ boardView: BoardView, didSelectCellAt location: Location) {
         guard let turn = turn else { return }
         if isAnimating { return }
         guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
-        try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+        try? placeDisk(turn, at: location, animated: true) { [weak self] _ in
             self?.nextTurn()
         }
     }
@@ -417,9 +418,9 @@ extension ViewController {
         }
         output += "\n"
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                output += boardView.diskAt(x: x, y: y).symbol
+        for row in boardView.yRange {
+            for col in boardView.xRange {
+                output += boardView.disk(at: Location(col: col, row: row)).symbol
             }
             output += "\n"
         }
@@ -467,20 +468,20 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
-            var y = 0
+            var row = 0
             while let line = lines.popFirst() {
-                var x = 0
+                var col = 0
                 for character in line {
                     let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    boardView.setDisk(disk, atX: x, y: y, animated: false)
-                    x += 1
+                    boardView.setDisk(disk, at: Location(col: col, row: row), animated: false)
+                    col += 1
                 }
-                guard x == boardView.width else {
+                guard col == boardView.width else {
                     throw FileIOError.read(path: path, cause: nil)
                 }
-                y += 1
+                row += 1
             }
-            guard y == boardView.height else {
+            guard row == boardView.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
         }
@@ -521,8 +522,7 @@ final class Canceller {
 
 struct DiskPlacementError: Error {
     let disk: Disk
-    let x: Int
-    let y: Int
+    let location: Location
 }
 
 // MARK: File-private extensions

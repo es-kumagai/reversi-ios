@@ -57,34 +57,35 @@ public class BoardView: UIView {
             cellViews[0].widthAnchor.constraint(equalTo: cellViews[0].heightAnchor),
         ])
         
-        for y in yRange {
-            for x in xRange {
+        for row in yRange {
+            for col in xRange {
+                let location = Location(col: col, row: row)
                 let topNeighborAnchor: NSLayoutYAxisAnchor
-                if let cellView = cellViewAt(x: x, y: y - 1) {
+                if let cellView = cellView(at: location.next(to: .top)) {
                     topNeighborAnchor = cellView.bottomAnchor
                 } else {
                     topNeighborAnchor = self.topAnchor
                 }
                 
                 let leftNeighborAnchor: NSLayoutXAxisAnchor
-                if let cellView = cellViewAt(x: x - 1, y: y) {
+                if let cellView = cellView(at: location.next(to: .left)) {
                     leftNeighborAnchor = cellView.rightAnchor
                 } else {
                     leftNeighborAnchor = self.leftAnchor
                 }
                 
-                let cellView = cellViewAt(x: x, y: y)!
+                let cellView = self.cellView(at: location)!
                 NSLayoutConstraint.activate([
                     cellView.topAnchor.constraint(equalTo: topNeighborAnchor, constant: lineWidth),
                     cellView.leftAnchor.constraint(equalTo: leftNeighborAnchor, constant: lineWidth),
                 ])
                 
-                if y == height - 1 {
+                if row == height - 1 {
                     NSLayoutConstraint.activate([
                         self.bottomAnchor.constraint(equalTo: cellView.bottomAnchor, constant: lineWidth),
                     ])
                 }
-                if x == width - 1 {
+                if col == width - 1 {
                     NSLayoutConstraint.activate([
                         self.rightAnchor.constraint(equalTo: cellView.rightAnchor, constant: lineWidth),
                     ])
@@ -94,10 +95,11 @@ public class BoardView: UIView {
         
         reset()
         
-        for y in yRange {
-            for x in xRange {
-                let cellView: CellView = cellViewAt(x: x, y: y)!
-                let action = CellSelectionAction(boardView: self, x: x, y: y)
+        for row in yRange {
+            for col in xRange {
+                let location = Location(col: col, row: row)
+                let cellView: CellView = self.cellView(at: location)!
+                let action = CellSelectionAction(boardView: self, location: location)
                 actions.append(action) // To retain the `action`
                 cellView.addTarget(action, action: #selector(action.selectCell), for: .touchUpInside)
             }
@@ -105,45 +107,44 @@ public class BoardView: UIView {
     }
     
     /// 盤をゲーム開始時に状態に戻します。このメソッドはアニメーションを伴いません。
+    /// NOTE: アニメが伴っても良いのではないか？
     public func reset() {
-        for y in  yRange {
-            for x in xRange {
-                setDisk(nil, atX: x, y: y, animated: false)
+        for row in  yRange {
+            for col in xRange {
+                setDisk(nil, at: Location(col: col, row: row), animated: false)
             }
         }
         
-        setDisk(.light, atX: width / 2 - 1, y: height / 2 - 1, animated: false)
-        setDisk(.dark, atX: width / 2, y: height / 2 - 1, animated: false)
-        setDisk(.dark, atX: width / 2 - 1, y: height / 2, animated: false)
-        setDisk(.light, atX: width / 2, y: height / 2, animated: false)
+        setDisk(.light, at: Location(col: width / 2 - 1, row: height / 2 - 1), animated: false)
+        setDisk(.dark, at: Location(col: width / 2, row: height / 2 - 1), animated: false)
+        setDisk(.dark, at: Location(col: width / 2 - 1, row: height / 2), animated: false)
+        setDisk(.light, at: Location(col: width / 2, row: height / 2), animated: false)
     }
     
-    private func cellViewAt(x: Int, y: Int) -> CellView? {
-        guard xRange.contains(x) && yRange.contains(y) else { return nil }
-        return cellViews[y * width + x]
+    private func cellView(at location: Location) -> CellView? {
+        guard xRange.contains(location.col) && yRange.contains(location.row) else { return nil }
+        return cellViews[location.col * width + location.row]
     }
     
-    /// `x`, `y` で指定されたセルの状態を返します。
+    /// `location` で指定されたセルの状態を返します。
     /// セルにディスクが置かれていない場合、 `nil` が返されます。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
+    /// - Parameter location: セルの位置です。
     /// - Returns: セルにディスクが置かれている場合はそのディスクの値を、置かれていない場合は `nil` を返します。
-    public func diskAt(x: Int, y: Int) -> Disk? {
-        cellViewAt(x: x, y: y)?.disk
+    public func disk(at location: Location) -> Disk? {
+        cellView(at: location)?.disk
     }
     
-    /// `x`, `y` で指定されたセルの状態を、与えられた `disk` に変更します。
+    /// `location` で指定されたセルの状態を、与えられた `disk` に変更します。
     /// `animated` が `true` の場合、アニメーションが実行されます。
     /// アニメーションの完了通知は `completion` ハンドラーで受け取ることができます。
     /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
+    /// - Parameter location: セルの位置です。
     /// - Parameter animated: セルの状態変更を表すアニメーションを表示するかどうかを指定します。
     /// - Parameter completion: アニメーションの完了通知を受け取るハンドラーです。
     ///     `animated` に `false` が指定された場合は状態が変更された後で即座に同期的に呼び出されます。
     ///     ハンドラーが受け取る `Bool` 値は、 `UIView.animate()`  等に準じます。
-    public func setDisk(_ disk: Disk?, atX x: Int, y: Int, animated: Bool, completion: ((Bool) -> Void)? = nil) {
-        guard let cellView = cellViewAt(x: x, y: y) else {
+    public func setDisk(_ disk: Disk?, at location: Location, animated: Bool, completion: ((Bool) -> Void)? = nil) {
+        guard let cellView = cellView(at: location) else {
             preconditionFailure() // FIXME: Add a message.
         }
         cellView.setDisk(disk, animated: animated, completion: completion)
@@ -151,26 +152,23 @@ public class BoardView: UIView {
 }
 
 public protocol BoardViewDelegate: AnyObject {
-    /// `boardView` の `x`, `y` で指定されるセルがタップされたときに呼ばれます。
+    /// `boardView` の `location` で指定されるセルがタップされたときに呼ばれます。
     /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
-    func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int)
+    /// - Parameter location: セルの位置です。
+    func boardView(_ boardView: BoardView, didSelectCellAt location: Location)
 }
 
 private class CellSelectionAction: NSObject {
     private weak var boardView: BoardView?
-    let x: Int
-    let y: Int
+    let location: Location
     
-    init(boardView: BoardView, x: Int, y: Int) {
+    init(boardView: BoardView, location: Location) {
         self.boardView = boardView
-        self.x = x
-        self.y = y
+        self.location = location
     }
     
     @objc func selectCell() {
         guard let boardView = boardView else { return }
-        boardView.delegate?.boardView(boardView, didSelectCellAtX: x, y: y)
+        boardView.delegate?.boardView(boardView, didSelectCellAt: location)
     }
 }
