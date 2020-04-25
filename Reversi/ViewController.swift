@@ -64,7 +64,7 @@ class ViewController: UIViewController {
         do {
             try gameController.loadGame()
         } catch _ {
-            newGame()
+            gameController.newGame()
         }
     }
     
@@ -107,33 +107,8 @@ class ViewController: UIViewController {
         
         if viewHasAppeared { return }
         viewHasAppeared = true
-        waitForPlayer()
-    }
-}
-
-// MARK: Game management
-
-extension ViewController {
-    /// ゲームの状態を初期化し、新しいゲームを開始します。
-    func newGame() {
         
-        for playerControl in playerControls {
-            playerControl.selectedSegmentIndex = Player.manual.rawValue
-        }
-        
-        try? gameController.saveGame()
-        gameController.newGame()
-    }
-    
-    /// プレイヤーの行動を待ちます。
-    func waitForPlayer() {
-        guard let turn = gameController.turn else { return }
-        switch Player(rawValue: playerControls[segmentIndex(of: turn)].selectedSegmentIndex)! {
-        case .manual:
-            break
-        case .computer:
-            gameController.playTurnOfComputer()
-        }
+        gameController.waitForPlayer()
     }
 }
 
@@ -192,6 +167,7 @@ extension ViewController {
 // MARK: Inputs
 
 extension ViewController {
+    
     /// リセットボタンが押された場合に呼ばれるハンドラーです。
     /// アラートを表示して、ゲームを初期化して良いか確認し、
     /// "OK" が選択された場合ゲームを初期化します。
@@ -205,8 +181,8 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
             guard let self = self else { return }
                         
-            self.newGame()
-            self.waitForPlayer()
+            self.gameController.newGame()
+            self.gameController.waitForPlayer()
             
             NotificationCenter.default.post(name: .ViewControllerReset, object: self)
         })
@@ -215,10 +191,8 @@ extension ViewController {
     
     /// プレイヤーのモードが変更された場合に呼ばれるハンドラーです。
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
+
         let side: Disk = self.side(of: sender)
-        
-        try? gameController.saveGame()
-        
         let player = Player(rawValue: sender.selectedSegmentIndex)!
         
         gameController.changePlayer(player, of: side)        
@@ -230,13 +204,11 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。
     /// - Parameter location: セルの位置です。
     func boardView(_ boardView: BoardView, didSelectCellAt location: Location) {
-        guard let turn = gameController.turn else { return }
-        guard case .manual = Player(rawValue: playerControls[segmentIndex(of: turn)].selectedSegmentIndex)! else { return }
+
         // try? because doing nothing when an error occurs
         do {
             
-            try gameController.placeDisk(turn, at: location, animated: true)
-            gameController.nextTurn()
+            try gameController.placeDisk(at: location, animated: true, switchToNextTurn: true)
         }
         catch _ {
             
@@ -329,7 +301,6 @@ extension ViewController : GameControllerDelegate {
         
         updateCountLabels()
         updateMessageViews()
-        waitForPlayer()
     }
     
     func gameController(_ controller: GameController, turnChangedButCannotMoveAnyware side: Disk) {

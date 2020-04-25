@@ -55,8 +55,10 @@ class GameController : NSObject {
         delegate?.gameController(self, gameWillStart: ())
         
         for side in Disk.sides {
+            
             playerCancellers[side]?.cancel()
             playerCancellers.removeValue(forKey: side)
+            playerController.changePlayer(of: side, to: .manual)
         }
         
         state = .playing(side: .dark)
@@ -65,12 +67,30 @@ class GameController : NSObject {
         delegate?.gameController(self, gameDidStartWithBoard: board)
     }
     
+    /// プレイヤーの行動を待ちます。
+    func waitForPlayer() {
+        
+        guard let turn = turn else { return }
+        
+        switch player(of: turn) {
+
+        case .manual:
+            break
+            
+        case .computer:
+            playTurnOfComputer()
+        }
+    }
+
     func changePlayer(_ player: Player, of side: Disk) {
         
         if let canceller = playerCancellers[side] {
             canceller.cancel()
         }
-        
+
+        playerController.changePlayer(of: side, to: player)
+        try? saveGame()
+
         if side == turn, case .computer = player {
             playTurnOfComputer()
         }
@@ -159,8 +179,7 @@ extension GameController {
             
             do {
                 
-                try self.placeDisk(turn, at: location, animated: true)
-                self.nextTurn()
+                try self.place(turn, at: location, animated: true, switchToNextTurn: true)
             }
             catch _ {
                 
@@ -309,29 +328,50 @@ extension GameController {
             if validMoves(for: turn.flipped).isEmpty {
                 
                 state = .over
+                try? saveGame()
+                
                 delegate?.gameController(self, gameOverWithWinner: dominantSide())
             }
             else {
 
                 state = .playing(side: turn)
+                try? saveGame()
+                
                 delegate?.gameController(self, turnChangedButCannotMoveAnyware: turn)
+
+                waitForPlayer()
             }
         }
         else {
             
             state = .playing(side: turn)
+            try? saveGame()
+                        
             delegate?.gameController(self, turnChanged: turn)
+
+            waitForPlayer()
         }
+    }
+
+    /// `location` で指定されたセルに、現在のターンの置きます。
+    /// - Parameter location: セルの位置です。
+    /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
+    /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
+    func placeDisk(at location: Location, animated isAnimated: Bool, switchToNextTurn: Bool) throws {
+        
+        guard let disk = turn, player(of: disk) == .manual else {
+            
+            return
+        }
+        
+        try place(disk, at: location, animated: isAnimated, switchToNextTurn: switchToNextTurn)
     }
     
     /// `location` で指定されたセルに `disk` を置きます。
     /// - Parameter location: セルの位置です。
     /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
-    /// - Parameter completion: アニメーション完了時に実行されるクロージャです。
-    ///     このクロージャは値を返さず、アニメーションが完了したかを示す真偽値を受け取ります。
-    ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
-    func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool) throws {
+    func place(_ disk: Disk, at location: Location, animated isAnimated: Bool, switchToNextTurn: Bool) throws {
         
         let flipLocations = flipLocationsBy(disk, at: location)
 
@@ -348,6 +388,14 @@ extension GameController {
         }
         
         try? saveGame()
+        
+        if switchToNextTurn {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration * Double(locations.count)) {
+                
+                self.nextTurn()
+            }
+        }
     }
 }
 
