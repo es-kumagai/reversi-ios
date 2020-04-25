@@ -38,9 +38,6 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
-    /// 新しいゲームを始める準備中に `true` になります。
-    private var preparingForNewGame: Bool = false
-
     private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
     private var viewUpdateRequestQueue: Queue<ViewUpdateRequest> = []
     private var viewUpdateMessageLoopSource: DispatchSourceTimer!
@@ -83,18 +80,15 @@ class ViewController: UIViewController {
             return
         }
         
-        // ゲーム開始の準備時はアニメーションを伴いません。
-        let animated = !preparingForNewGame
-        
         DispatchQueue.main.async {
             
             switch request {
                 
             case .square(disk: let disk, location: let location):
-                self.boardView.set(disk: disk, location: location, animated: animated)
+                self.boardView.set(disk: disk, location: location, animated: true)
                 
             case .board(board: let board):
-                self.boardView.set(board: board, animated: animated)
+                self.boardView.set(board: board, animated: true)
                 
             case .sleep(interval: let interval):
                 self.viewUpdateMessageLoopSleepCount = interval / self.viewUpdateMessageLoopDuration
@@ -254,13 +248,10 @@ extension ViewController : GameControllerDelegate {
     
     func gameController(_ controller: GameController, gameWillStart _: Void) {
         
-        preparingForNewGame = true
     }
     
     func gameController(_ controller: GameController, gameDidStartWithBoard board: Board) {
 
-        preparingForNewGame = false
-        
         clearViewUpdateRequests()
         updateBoard(board)
         updateMessageViews()
