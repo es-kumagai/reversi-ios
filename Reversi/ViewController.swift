@@ -88,16 +88,6 @@ extension ViewController {
     }
     
     private func flippedDiskLocationsByPlacingDisk(_ disk: Disk, at location: Location) -> [Location] {
-        let directions: [Direction] = [
-            .leftTop,
-            .top,
-            .rightTop,
-            .right,
-            .rightBottom,
-            .bottom,
-            .leftBottom,
-            .left,
-        ]
         
         guard boardView.disk(at: location) == nil else {
             return []
@@ -105,7 +95,7 @@ extension ViewController {
         
         var diskLocations: [Location] = []
         
-        for direction in directions {
+        for direction in Direction.allDirections {
             
             var location = location
             var diskLocationsInLine: [Location] = []

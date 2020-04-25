@@ -15,10 +15,24 @@ public struct Direction : OptionSet {
     public static let left = Direction(rawValue: 1 << 2)
     public static let right = Direction(rawValue: 1 << 3)
     
-    public static let leftTop: Direction = [.left, .top]
-    public static let rightTop: Direction = [.right, .top]
-    public static let rightBottom: Direction = [.right, .bottom]
-    public static let leftBottom: Direction = [.left, .bottom]
+    public static var leftTop: Direction { return [.left, .top] }
+    public static var rightTop: Direction { return [.right, .top] }
+    public static var rightBottom: Direction { return [.right, .bottom] }
+    public static var leftBottom: Direction { return [.left, .bottom] }
+    
+    public static var allDirections: [Direction] {
+        
+        return [
+            .leftTop,
+            .top,
+            .rightTop,
+            .right,
+            .rightBottom,
+            .bottom,
+            .leftBottom,
+            .left,
+        ]
+    }
     
     public init(rawValue: Int) {
         
