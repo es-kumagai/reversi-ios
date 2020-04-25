@@ -19,7 +19,7 @@ class GameController : NSObject {
     
     private(set) var board = Board(cols: 8, rows: 8)
     
-    public func newGame() {
+    func newGame() {
         
         NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self)
         
@@ -64,5 +64,28 @@ class GameController : NSObject {
             "location" : location,
             "animationDuration" : duration
         ])
+    }
+    
+    /// 盤上に置かれたディスクの枚数が多い方の色を返します。
+    /// 引き分けの場合は `nil` が返されます。
+    /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。
+    func dominantSide() -> Disk? {
+        
+        let darkCount = diskCount(of: .dark)
+        let lightCount = diskCount(of: .light)
+
+        if darkCount == lightCount {
+            return nil
+        } else {
+            return darkCount > lightCount ? .dark : .light
+        }
+    }
+    
+    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
+    /// - Parameter side: 数えるディスクの色です。
+    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
+    func diskCount(of side: Disk) -> Int {
+        
+        return board.count(of: side)
     }
 }

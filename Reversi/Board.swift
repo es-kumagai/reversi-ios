@@ -48,6 +48,16 @@ extension Board {
         return cols * rows
     }
     
+    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
+    /// - Parameter side: 数えるディスクの色です。
+    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
+    func count(of side: Disk) -> Int {
+        
+        return squares
+            .filter { $0.disk == side }
+            .count
+    }
+
     /// 盤上の全ての升目を列単位で取得します。
     var squaresPerRow: [[Square]] {
         

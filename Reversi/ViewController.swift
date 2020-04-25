@@ -129,29 +129,7 @@ class ViewController: UIViewController {
 // MARK: Reversi logics
 
 extension ViewController {
-    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
-    /// - Parameter side: 数えるディスクの色です。
-    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
-    func countDisks(of side: Disk) -> Int {
         
-        return gameController.board.squares
-            .filter { $0.disk == side }
-            .count
-    }
-    
-    /// 盤上に置かれたディスクの枚数が多い方の色を返します。
-    /// 引き分けの場合は `nil` が返されます。
-    /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。
-    func sideWithMoreDisks() -> Disk? {
-        let darkCount = countDisks(of: .dark)
-        let lightCount = countDisks(of: .light)
-        if darkCount == lightCount {
-            return nil
-        } else {
-            return darkCount > lightCount ? .dark : .light
-        }
-    }
-    
     private func flipLocationsBy(_ disk: Disk, at location: Location) -> [Location] {
         
         guard gameController.disk(at: location) == nil else {
@@ -377,7 +355,7 @@ extension ViewController {
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
-            countLabels[side.index].text = "\(countDisks(of: side))"
+            countLabels[side.index].text = "\(gameController.diskCount(of: side))"
         }
     }
     
@@ -389,7 +367,7 @@ extension ViewController {
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
         case .none:
-            if let winner = self.sideWithMoreDisks() {
+            if let winner = gameController.dominantSide() {
                 messageDiskSizeConstraint.constant = messageDiskSize
                 messageDiskView.disk = winner
                 messageLabel.text = " won"
