@@ -10,6 +10,8 @@
 		B1DE08542453B89C00E4D54C /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1DE08532453B89C00E4D54C /* Location.swift */; };
 		B1DE08562453BCA700E4D54C /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1DE08552453BCA700E4D54C /* Direction.swift */; };
 		B1F4B1472453CAD3005A1DC7 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B1462453CAD3005A1DC7 /* GameController.swift */; };
+		B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */; };
+		B1F4B14C2453D43D005A1DC7 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B14B2453D43D005A1DC7 /* Player.swift */; };
 		D636B39F23D35043007F370F /* DiskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D636B39E23D35043007F370F /* DiskView.swift */; };
 		D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB323A9FE4500396732 /* AppDelegate.swift */; };
 		D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB523A9FE4500396732 /* SceneDelegate.swift */; };
@@ -37,6 +39,8 @@
 		B1DE08532453B89C00E4D54C /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		B1DE08552453BCA700E4D54C /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		B1F4B1462453CAD3005A1DC7 /* GameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
+		B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerPlayer.swift; sourceTree = "<group>"; };
+		B1F4B14B2453D43D005A1DC7 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		D636B39E23D35043007F370F /* DiskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskView.swift; sourceTree = "<group>"; };
 		D642BDB023A9FE4500396732 /* Reversi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reversi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D642BDB323A9FE4500396732 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +82,15 @@
 				B1F4B1462453CAD3005A1DC7 /* GameController.swift */,
 			);
 			name = Controllers;
+			sourceTree = "<group>";
+		};
+		B1F4B1482453D3AD005A1DC7 /* Players */ = {
+			isa = PBXGroup;
+			children = (
+				B1F4B14B2453D43D005A1DC7 /* Player.swift */,
+				B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */,
+			);
+			name = Players;
 			sourceTree = "<group>";
 		};
 		D636B3A123D43203007F370F /* Views */ = {
@@ -129,6 +142,7 @@
 				D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */,
 				D642BDC123A9FE4700396732 /* Info.plist */,
 				D636B3A123D43203007F370F /* Views */,
+				B1F4B1482453D3AD005A1DC7 /* Players */,
 				B1F4B1452453CAC4005A1DC7 /* Controllers */,
 				D636B3A423D432D3007F370F /* DataTypes */,
 			);
@@ -249,6 +263,8 @@
 				B1F4B1472453CAD3005A1DC7 /* GameController.swift in Sources */,
 				D642BDD623AA0B3900396732 /* CellView.swift in Sources */,
 				B1DE08542453B89C00E4D54C /* Location.swift in Sources */,
+				B1F4B14C2453D43D005A1DC7 /* Player.swift in Sources */,
+				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				D642BDD823AA0B5700396732 /* Disk.swift in Sources */,
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
 				D642BDDC23AA137C00396732 /* BoardView.swift in Sources */,
