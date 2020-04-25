@@ -128,7 +128,7 @@ extension ViewController {
     /// プレイヤーの行動を待ちます。
     func waitForPlayer() {
         guard let turn = gameController.turn else { return }
-        switch Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! {
+        switch Player(rawValue: playerControls[segmentIndex(of: turn)].selectedSegmentIndex)! {
         case .manual:
             break
         case .computer:
@@ -165,7 +165,7 @@ extension ViewController {
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
-            countLabels[side.index].text = "\(gameController.diskCount(of: side))"
+            countLabels[segmentIndex(of: side)].text = "\(gameController.diskCount(of: side))"
         }
     }
     
@@ -215,7 +215,7 @@ extension ViewController {
     
     /// プレイヤーのモードが変更された場合に呼ばれるハンドラーです。
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
-        let side: Disk = Disk(index: playerControls.firstIndex(of: sender)!)
+        let side: Disk = self.side(of: sender)
         
         try? gameController.saveGame()
         
@@ -231,7 +231,7 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter location: セルの位置です。
     func boardView(_ boardView: BoardView, didSelectCellAt location: Location) {
         guard let turn = gameController.turn else { return }
-        guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
+        guard case .manual = Player(rawValue: playerControls[segmentIndex(of: turn)].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
         do {
             
@@ -246,21 +246,34 @@ extension ViewController: BoardViewDelegate {
 
 // MARK: File-private extensions
 
-extension Disk {
-    init(index: Int) {
-        for side in Disk.sides {
-            if index == side.index {
-                self = side
-                return
-            }
+private extension ViewController {
+    
+    func segmentIndex(of side: Disk) -> Int {
+        
+        switch side {
+            
+        case .dark:
+            return 0
+            
+        case .light:
+            return 1
         }
-        preconditionFailure("Illegal index: \(index)")
     }
     
-    var index: Int {
-        switch self {
-        case .dark: return 0
-        case .light: return 1
+    func side(of segmentControl: UISegmentedControl) -> Disk {
+        
+        let index = playerControls.firstIndex(of: segmentControl)!
+        
+        switch index {
+            
+        case 0:
+            return .dark
+            
+        case 1:
+            return .light
+            
+        default:
+            fatalError("Invalid index: \(index)")
         }
     }
 }
@@ -284,7 +297,7 @@ extension ViewController : GameControllerDelegate {
         for side in Disk.sides {
 
             let player = gameController.player(of: side)
-            playerControls[side.index].selectedSegmentIndex = player.rawValue
+            playerControls[segmentIndex(of: side)].selectedSegmentIndex = player.rawValue
         }
     }
     
@@ -304,12 +317,12 @@ extension ViewController : GameControllerDelegate {
 
     func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk) {
         
-        playerActivityIndicators[side.index].startAnimating()
+        playerActivityIndicators[segmentIndex(of: side)].startAnimating()
     }
     
     func gameController(_ controller: GameController, ponderingDidEndBySide side: Disk) {
         
-        playerActivityIndicators[side.index].stopAnimating()
+        playerActivityIndicators[segmentIndex(of: side)].stopAnimating()
     }
     
     func gameController(_ controller: GameController, turnChanged side: Disk) {
