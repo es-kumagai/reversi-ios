@@ -77,6 +77,11 @@ class GameController : NSObject {
         
         guard let turn = turn else { return }
         
+        guard nextMoveAvailable(on: turn) else {
+
+            return nextTurn(afterDelay: 0)
+        }
+        
         switch player(of: turn) {
 
         case .manual:
@@ -168,9 +173,12 @@ extension GameController {
     func playTurnOfComputer() {
         guard let turn = turn else { preconditionFailure() }
         
-        delegate?.gameController(self, ponderingWillStartBySide: turn)
+        guard let location = validMoves(for: turn).randomElement() else {
+            
+            return
+        }
         
-        let location = validMoves(for: turn).randomElement()!
+        delegate?.gameController(self, ponderingWillStartBySide: turn)
         
         let cleanUp: () -> Void = { [weak self] in
             guard let self = self else { return }
@@ -303,6 +311,14 @@ extension GameController {
         !flipLocationsBy(disk, at: location).isEmpty
     }
     
+    /// `side` で指定した側が次の一手を持っているか調べます。
+    /// - Parameter side: 対象となる色です。
+    /// - Returns: 次の一手を打てる場合に `true` を、そうでなければ `false` を返します。
+    func nextMoveAvailable(on side: Disk) -> Bool {
+        
+        return !validMoves(for: side).isEmpty
+    }
+    
     /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
     /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
     func validMoves(for side: Disk) -> [Location] {
@@ -329,12 +345,11 @@ extension GameController {
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗が確定します。
     func nextTurn(afterDelay delay: Double) {
-        guard var turn = turn else { return }
+
+        guard let turn = turn?.flipped else { return }
         
-        turn.flip()
-        
-        if validMoves(for: turn).isEmpty {
-            if validMoves(for: turn.flipped).isEmpty {
+        if !nextMoveAvailable(on: turn) {
+            if !nextMoveAvailable(on: turn.flipped) {
                 
                 state = .over
                 try? saveGame()
