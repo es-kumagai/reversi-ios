@@ -552,9 +552,6 @@ extension ViewController {
 
             NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["board" : gameController.board])
         }
-        
-        updateMessageViews()
-        updateCountLabels()
     }
     
     enum FileIOError: Error {
