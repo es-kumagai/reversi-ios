@@ -30,7 +30,6 @@ class ViewController: UIViewController {
     private var turn: Disk? = .dark
 
     /// 新しいゲームを始める準備中に `true` になります。
-    private var gameNumber: Int = 0
     private var preparingForNewGame: Bool = false
 
     private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
@@ -63,7 +62,6 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(forName: .GameControllerGameDidStart, object: nil, queue: nil) { [unowned self] notification in
             
             self.preparingForNewGame = false
-            self.gameNumber = notification.userInfo!["gameNumber"] as! Int
             
             let board = notification.userInfo!["board"] as! Board
 
@@ -86,7 +84,7 @@ class ViewController: UIViewController {
     
     func diskChangeRequestMessageLoop() {
         
-        guard let request = viewUpdateRequestQueue.dequeue(forGameNumber: gameNumber) else {
+        guard let request = viewUpdateRequestQueue.dequeue() else {
             
             return
         }
@@ -98,10 +96,10 @@ class ViewController: UIViewController {
             
             switch request {
                 
-            case .square(gameNumber: _, disk: let disk, location: let location):
+            case .square(disk: let disk, location: let location):
                 self.boardView.set(disk: disk, location: location, animated: animated)
                 
-            case .board(gameNumber: _, board: let board):
+            case .board(board: let board):
                 self.boardView.set(board: board, animated: animated)
             }
         }
@@ -350,9 +348,8 @@ extension ViewController {
 
         let disk = notification.userInfo!["disk"] as! Disk?
         let location = notification.userInfo!["location"] as! Location
-        let gameNumber = notification.userInfo!["gameNumber"] as! Int
 
-        let request = ViewUpdateRequest.square(gameNumber: gameNumber, disk: disk, location: location)
+        let request = ViewUpdateRequest.square(disk: disk, location: location)
         
         viewUpdateProcessingQueue.async {
             
@@ -372,7 +369,7 @@ extension ViewController {
     /// 盤面を一括で更新します。
     func updateBoard(_ board: Board) {
         
-        let request = ViewUpdateRequest.board(gameNumber: gameNumber, board: board)
+        let request = ViewUpdateRequest.board(board: board)
         
         viewUpdateProcessingQueue.async {
             
@@ -537,7 +534,7 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
-            NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
+            NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: nil)
 
             var row = 0
             while let line = lines.popFirst() {
@@ -556,7 +553,7 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
 
-            NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber, "board" : gameController.board])
+            NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["board" : gameController.board])
         }
         
         updateMessageViews()

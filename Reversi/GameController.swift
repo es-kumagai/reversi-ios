@@ -17,19 +17,15 @@ extension Notification.Name {
 
 class GameController : NSObject {
     
-    private(set) var gameNumber = 0
-    
     private(set) var board = Board(cols: 8, rows: 8)
     
     public func newGame() {
         
-        gameNumber += 1
-
-        NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self, userInfo: ["gameNumber" : gameNumber])
+        NotificationCenter.default.post(name: .GameControllerGameWillStart, object: self)
         
         board.reset()
 
-        NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["gameNumber" : gameNumber, "board" : board])
+        NotificationCenter.default.post(name: .GameControllerGameDidStart, object: self, userInfo: ["board" : board])
     }
     
     /// `location` で指定された升目の `disk` を参照します。
@@ -64,8 +60,7 @@ class GameController : NSObject {
         
         NotificationCenter.default.post(name: .GameControllerDiskSet, object: self, userInfo: [
             "disk" : disk as Any,
-            "location" : location,
-            "gameNumber" : gameNumber
+            "location" : location
         ])
     }
 }
