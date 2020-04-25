@@ -152,7 +152,7 @@ extension ViewController {
         }
     }
     
-    private func flippedDiskLocationsByPlacingDisk(_ disk: Disk, at location: Location) -> [Location] {
+    private func flipLocationsBy(_ disk: Disk, at location: Location) -> [Location] {
         
         guard gameController.disk(at: location) == nil else {
             return []
@@ -195,7 +195,7 @@ extension ViewController {
     /// - Parameter y: セルの行です。
     /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
     func canPlaceDisk(_ disk: Disk, at location: Location) -> Bool {
-        !flippedDiskLocationsByPlacingDisk(disk, at: location).isEmpty
+        !flipLocationsBy(disk, at: location).isEmpty
     }
     
     /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
@@ -221,7 +221,7 @@ extension ViewController {
     /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func placeDisk(_ disk: Disk, at location: Location, animated isAnimated: Bool) throws {
         
-        let flipLocations = flippedDiskLocationsByPlacingDisk(disk, at: location)
+        let flipLocations = flipLocationsBy(disk, at: location)
 
         guard !flipLocations.isEmpty else {
             throw DiskPlacementError(disk: disk, location: location)
