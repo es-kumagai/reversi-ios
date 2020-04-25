@@ -8,7 +8,7 @@ extension Notification.Name {
 class ViewController: UIViewController {
     
     private let notificationCenter = NotificationCenter.default
-    private let gameController = GameController()
+    @IBOutlet private var gameController: GameController!
     
     @IBOutlet private var boardView: BoardView!
     
@@ -64,11 +64,10 @@ extension ViewController {
     func countDisks(of side: Disk) -> Int {
         var count = 0
         
-        for row in boardView.yRange {
-            for col in boardView.xRange {
-                if boardView.disk(at: Location(col: col, row: row)) == side {
-                    count +=  1
-                }
+        for square in gameController.board.squares {
+            if boardView.disk(at: square.location) == side {
+                count +=  1
+                
             }
         }
         
@@ -107,7 +106,7 @@ extension ViewController {
         var diskLocations: [Location] = []
         
         for direction in directions {
-
+            
             var location = location
             var diskLocationsInLine: [Location] = []
             
@@ -143,18 +142,15 @@ extension ViewController {
     func validMoves(for side: Disk) -> [Location] {
         var locations: [Location] = []
         
-        for row in boardView.yRange {
-            for col in boardView.xRange {
-                let location = Location(col: col, row: row)
-                if canPlaceDisk(side, at: location) {
-                    locations.append(location)
-                }
+        for square in gameController.board.squares {
+            if canPlaceDisk(side, at: square.location) {
+                locations.append(square.location)
             }
         }
         
         return locations
     }
-
+    
     /// `location` で指定されたセルに `disk` を置きます。
     /// - Parameter location: セルの位置です。
     /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
@@ -171,7 +167,7 @@ extension ViewController {
         if isAnimated {
             animateSettingDisks(at: [location] + diskLocations, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
- 
+                
                 completion?(isFinished)
                 try? self.saveGame()
                 self.updateCountLabels()
@@ -227,7 +223,7 @@ extension ViewController {
         for playerControl in playerControls {
             playerControl.selectedSegmentIndex = Player.manual.rawValue
         }
-
+        
         updateMessageViews()
         updateCountLabels()
         
@@ -251,7 +247,7 @@ extension ViewController {
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
     func nextTurn() {
         guard var turn = self.turn else { return }
-
+        
         turn.flip()
         
         if validMoves(for: turn).isEmpty {
@@ -283,7 +279,7 @@ extension ViewController {
     func playTurnOfComputer() {
         guard let turn = self.turn else { preconditionFailure() }
         let location = validMoves(for: turn).randomElement()!
-
+        
         playerActivityIndicators[turn.index].startAnimating()
         
         let cleanUp: () -> Void = { [weak self] in
@@ -411,9 +407,9 @@ extension ViewController {
         }
         output += "\n"
         
-        for row in boardView.yRange {
-            for col in boardView.xRange {
-                output += boardView.disk(at: Location(col: col, row: row)).symbol
+        for squaresPerRow in gameController.board.squaresPerRow {
+            for square in squaresPerRow {
+                output += boardView.disk(at: square.location).symbol
             }
             output += "\n"
         }
@@ -438,26 +434,26 @@ extension ViewController {
             guard
                 let diskSymbol = line.popFirst(),
                 let disk = Optional<Disk>(symbol: diskSymbol.description)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
+                else {
+                    throw FileIOError.read(path: path, cause: nil)
             }
             turn = disk
         }
-
+        
         // players
         for side in Disk.sides {
             guard
                 let playerSymbol = line.popFirst(),
                 let playerNumber = Int(playerSymbol.description),
                 let player = Player(rawValue: playerNumber)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
+                else {
+                    throw FileIOError.read(path: path, cause: nil)
             }
             playerControls[side.index].selectedSegmentIndex = player.rawValue
         }
-
+        
         do { // board
-            guard lines.count == boardView.height else {
+            guard lines.count == gameController.board.rows else {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
@@ -469,16 +465,16 @@ extension ViewController {
                     boardView.setDisk(disk, at: Location(col: col, row: row), animated: false)
                     col += 1
                 }
-                guard col == boardView.width else {
+                guard col == gameController.board.cols else {
                     throw FileIOError.read(path: path, cause: nil)
                 }
                 row += 1
             }
-            guard row == boardView.height else {
+            guard row == gameController.board.rows else {
                 throw FileIOError.read(path: path, cause: nil)
             }
         }
-
+        
         updateMessageViews()
         updateCountLabels()
     }

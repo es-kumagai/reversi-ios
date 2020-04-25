@@ -53,6 +53,9 @@
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="zq8-hK-TyQ" secondAttribute="height" multiplier="1:1" id="2W1-wd-IFi"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="gameController" destination="Tcq-mQ-Lh6" id="uDp-Bf-d5g"/>
+                                </connections>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mdv-qG-dMQ" userLabel="Dark View">
                                 <rect key="frame" x="20" y="210" width="270" height="31"/>
@@ -179,6 +182,7 @@
                     </view>
                     <connections>
                         <outlet property="boardView" destination="zq8-hK-TyQ" id="7Tx-KA-DlY"/>
+                        <outlet property="gameController" destination="Tcq-mQ-Lh6" id="67V-PU-LrJ"/>
                         <outlet property="messageDiskSizeConstraint" destination="gHu-Ly-73K" id="52y-fo-Ths"/>
                         <outlet property="messageDiskView" destination="xhS-zB-FaD" id="Cel-dc-EWk"/>
                         <outlet property="messageLabel" destination="nHv-pJ-hrU" id="bqV-9P-ADo"/>
@@ -191,6 +195,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <customObject id="Tcq-mQ-Lh6" customClass="GameController" customModule="Reversi" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
         </scene>

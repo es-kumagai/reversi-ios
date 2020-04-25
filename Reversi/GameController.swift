@@ -13,11 +13,13 @@ extension Notification.Name {
     static let GameControllerNewGame = Notification.Name("GameControllerNewGame")
 }
 
-class GameController {
+class GameController : NSObject {
     
     private(set) var gameNumber = 0
     private let notificationCenter = NotificationCenter.default
-    
+ 
+    private(set) var board = Board(cols: 8, rows: 8)
+
     public func newGame() {
         
         gameNumber += 1
