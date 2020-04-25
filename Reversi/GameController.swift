@@ -14,6 +14,9 @@ class GameController : NSObject {
     
     /// 試合中でどちらの色のプレイヤーのターンかを `.playing` で表します。ゲーム終了時は `.over` です。
     private(set) var state: GameState = .over
+
+    /// 現在のターンでディスクを置いて良い状態であることを示します。アニメーションが終わる頃合いを待つのに使います。
+    private(set) var allowPlacingOnThisTurn = true
     
     /// アニメーションの待ち時間を指定します。
     private var animationDuration = 0.3
@@ -62,13 +65,15 @@ class GameController : NSObject {
         }
         
         state = .playing(side: .dark)
+        allowPlacingOnThisTurn = true
+
         board.reset()
 
         delegate?.gameController(self, gameDidStartWithBoard: board)
     }
     
     /// プレイヤーの行動を待ちます。
-    func waitForPlayer() {
+    func waitForPlayer(afterDelay delay: Double) {
         
         guard let turn = turn else { return }
         
@@ -78,7 +83,10 @@ class GameController : NSObject {
             break
             
         case .computer:
-            playTurnOfComputer()
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+
+                self.playTurnOfComputer()
+            }
         }
     }
 
@@ -282,6 +290,7 @@ extension GameController {
                 throw FileIOError.read(path: path, cause: nil)
             }
 
+            allowPlacingOnThisTurn = true
             delegate?.gameController(self, gameDidStartWithBoard: board)
         }
     }
@@ -318,8 +327,8 @@ extension GameController {
     
     /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
-    /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
-    func nextTurn() {
+    /// 両プレイヤーに有効な手がない場合、ゲームの勝敗が確定します。
+    func nextTurn(afterDelay delay: Double) {
         guard var turn = turn else { return }
         
         turn.flip()
@@ -339,17 +348,17 @@ extension GameController {
                 
                 delegate?.gameController(self, turnChangedButCannotMoveAnyware: turn)
 
-                waitForPlayer()
+                waitForPlayer(afterDelay: delay)
             }
         }
         else {
             
             state = .playing(side: turn)
             try? saveGame()
-                        
+
             delegate?.gameController(self, turnChanged: turn)
 
-            waitForPlayer()
+            waitForPlayer(afterDelay: delay)
         }
     }
 
@@ -373,11 +382,18 @@ extension GameController {
     /// - Throws: もし `disk` を `location` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func place(_ disk: Disk, at location: Location, animated isAnimated: Bool, switchToNextTurn: Bool) throws {
         
+        guard allowPlacingOnThisTurn else {
+            
+            return
+        }
+
         let flipLocations = flipLocationsBy(disk, at: location)
 
         guard !flipLocations.isEmpty else {
             throw DiskPlacementError(disk: disk, location: location)
         }
+        
+        allowPlacingOnThisTurn = false
         
         let locations = [location] + flipLocations
         let duration = isAnimated ? animationDuration : 0
@@ -390,11 +406,19 @@ extension GameController {
         try? saveGame()
         
         if switchToNextTurn {
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration * Double(locations.count)) {
+
+            let delay = animationDuration * Double(locations.count)
+                        
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 
-                self.nextTurn()
+                self.allowPlacingOnThisTurn = true
             }
+            
+            nextTurn(afterDelay: delay)
+        }
+        else {
+            
+            allowPlacingOnThisTurn = true
         }
     }
 }

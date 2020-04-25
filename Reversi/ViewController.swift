@@ -108,7 +108,7 @@ class ViewController: UIViewController {
         if viewHasAppeared { return }
         viewHasAppeared = true
         
-        gameController.waitForPlayer()
+        gameController.waitForPlayer(afterDelay: 0)
     }
 }
 
@@ -182,7 +182,7 @@ extension ViewController {
             guard let self = self else { return }
                         
             self.gameController.newGame()
-            self.gameController.waitForPlayer()
+            self.gameController.waitForPlayer(afterDelay: 0)
             
             NotificationCenter.default.post(name: .ViewControllerReset, object: self)
         })
@@ -314,7 +314,7 @@ extension ViewController : GameControllerDelegate {
         )
         
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { [unowned self] _ in
-            self.gameController.nextTurn()
+            self.gameController.nextTurn(afterDelay: 0)
         })
         
         present(alertController, animated: true)
