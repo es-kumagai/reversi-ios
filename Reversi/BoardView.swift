@@ -12,22 +12,11 @@ public class BoardView: UIView {
     /// セルがタップされたときの挙動を移譲するためのオブジェクトです。
     weak var delegate: BoardViewDelegate?
     
-    override public init(frame: CGRect) {
-        
-        super.init(frame: frame)
-    }
-    
-    required public init?(coder: NSCoder) {
-        
-        super.init(coder: coder)
-    }
-    
     public override func awakeFromNib() {
         
         super.awakeFromNib()
         
-        setUp()
-        
+        setUp()        
     }
 
     private func setUp() {

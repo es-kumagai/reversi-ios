@@ -15,7 +15,13 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBOutlet private var boardView: BoardView!
+    @IBOutlet private var boardView: BoardView! {
+        
+        didSet {
+            
+            boardView.delegate = self
+        }
+    }
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
@@ -45,7 +51,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        boardView.delegate = self
         messageDiskSize = messageDiskSizeConstraint.constant
         
         let source = DispatchSource.makeTimerSource(flags: [], queue: viewUpdateProcessingQueue)
@@ -237,28 +242,6 @@ extension ViewController: BoardViewDelegate {
             
         }
     }
-}
-
-// MARK: Additional types
-
-final class Canceller {
-    private(set) var isCancelled: Bool = false
-    private let body: (() -> Void)?
-    
-    init(_ body: (() -> Void)?) {
-        self.body = body
-    }
-    
-    func cancel() {
-        if isCancelled { return }
-        isCancelled = true
-        body?()
-    }
-}
-
-struct DiskPlacementError: Error {
-    let disk: Disk
-    let location: Location
 }
 
 // MARK: File-private extensions
