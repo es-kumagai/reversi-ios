@@ -83,15 +83,15 @@ extension ViewController {
     }
     
     private func flippedDiskLocationsByPlacingDisk(_ disk: Disk, at location: Location) -> [Location] {
-        let directions = [
-            (x: -1, y: -1),
-            (x:  0, y: -1),
-            (x:  1, y: -1),
-            (x:  1, y:  0),
-            (x:  1, y:  1),
-            (x:  0, y:  1),
-            (x: -1, y:  0),
-            (x: -1, y:  1),
+        let directions: [Direction] = [
+            .leftTop,
+            .top,
+            .rightTop,
+            .right,
+            .rightBottom,
+            .bottom,
+            .leftBottom,
+            .left,
         ]
         
         guard boardView.disk(at: location) == nil else {
@@ -101,15 +101,13 @@ extension ViewController {
         var diskLocations: [Location] = []
         
         for direction in directions {
-            var col = location.col
-            var row = location.row
-            
+
+            var location = location
             var diskLocationsInLine: [Location] = []
+            
             flipping: while true {
-                col += direction.x
-                row += direction.y
+                location = location.next(to: direction)
                 
-                let location = Location(col: col, row: row)
                 switch (disk, boardView.disk(at: location)) { // Uses tuples to make patterns exhaustive
                 case (.dark, .some(.dark)), (.light, .some(.light)):
                     diskLocations.append(contentsOf: diskLocationsInLine)
@@ -125,7 +123,7 @@ extension ViewController {
         return diskLocations
     }
     
-    /// `x`, `y` で指定されたセルに、 `disk` が置けるかを調べます。
+    /// `location` で指定されたセルに、 `disk` が置けるかを調べます。
     /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
     /// - Parameter location: セルの位置です。
     /// - Parameter y: セルの行です。
@@ -151,7 +149,7 @@ extension ViewController {
         return locations
     }
 
-    /// `x`, `y` で指定されたセルに `disk` を置きます。
+    /// `location` で指定されたセルに `disk` を置きます。
     /// - Parameter location: セルの位置です。
     /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
     /// - Parameter completion: アニメーション完了時に実行されるクロージャです。

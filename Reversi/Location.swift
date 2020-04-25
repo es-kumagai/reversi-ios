@@ -16,19 +16,28 @@ extension Location {
     
     public func next(to direction: Direction) -> Location {
 
-        switch direction {
-            
-        case .top:
-            return Location(col: col, row: row - 1)
+        var location = self
+        
+        if direction.contains(.top) {
 
-        case .bottom:
-            return Location(col: col, row: row + 1)
-
-        case .left:
-            return Location(col: col - 1, row: row)
-
-        case .right:
-            return Location(col: col + 1, row: row)
+            location = Location(col: location.col, row: location.row - 1)
         }
+
+        if direction.contains(.bottom) {
+
+            location = Location(col: location.col, row: location.row + 1)
+        }
+
+        if direction.contains(.left) {
+
+            location = Location(col: location.col - 1, row: location.row)
+        }
+
+        if direction.contains(.right) {
+
+            location = Location(col: location.col + 1, row: location.row)
+        }
+        
+        return location
     }
 }
