@@ -17,7 +17,7 @@ class GameController : NSObject {
     
     /// アニメーションの待ち時間を指定します。
     private var animationDuration = 0.3
-    weak var delegate: GameControllerDelegate?
+    @IBOutlet weak var delegate: GameControllerDelegate?
     
     @IBOutlet private var playerController: PlayerController!
     @IBOutlet private var turnController: TurnController!
@@ -25,8 +25,6 @@ class GameController : NSObject {
     private var playerCancellers: [Disk: Canceller] = [:]
     
     func newGame() {
-        
-        delegate?.gameController(self, gameWillStart: ())
         
         for side in Disk.sides {
             
@@ -103,28 +101,28 @@ class GameController : NSObject {
             fatalError("Location Out of Range: \(location)")
         }
         
-        return board[location]
+        return board[location].side
     }
     
     /// `location` で指定された升目に `disk` を設定します。
-    /// - Parameter disk: 升目に設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
+    /// - Parameter state: 升目に設定される新しい状態です。
     /// - Parameter location: セルの位置です。
     /// - Parameter animationDuration: アニメーション表示時の待ち時間です。
-    func set(_ disk: Disk?, at location: Location, animationDuration duration: Double) {
+    func set(_ state: SquareState, at location: Location, animationDuration duration: Double) {
         
         guard board.contains(location) else {
             
             fatalError("Location Out of Range: \(location)")
         }
         
-        guard board[location] != disk else {
+        guard board[location] != state else {
             
             return
         }
         
-        board[location] = disk
+        board[location] = state
         
-        delegate?.gameController(self, setDisk: disk, location: location, animationDuration: duration)
+        delegate?.gameController(self, setSquare: state, location: location, animationDuration: duration)
     }
     
     /// 盤上に置かれたディスクの枚数が多い方の色を返します。
@@ -215,7 +213,7 @@ extension GameController {
         
         for squaresPerRow in board.squaresPerRow {
             for square in squaresPerRow {
-                output += square.disk?.description ?? "-"
+                output += square.state.description
             }
             output += "\n"
         }
@@ -274,14 +272,12 @@ extension GameController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
-            delegate?.gameController(self, gameWillStart: ())
-            
             var row = 0
             while let line = lines.popFirst() {
                 var col = 0
                 for character in line {
-                    let disk = Disk(description: "\(character)")
-                    set(disk, at: Location(col: col, row: row), animationDuration: 0)
+                    let state = SquareState(description: "\(character)")!
+                    set(state, at: Location(col: col, row: row), animationDuration: 0)
                     col += 1
                 }
                 guard col == board.cols else {
@@ -298,7 +294,7 @@ extension GameController {
 
         if turnController.isGameOver {
 
-            delegate?.gameController(self, gameOverWithWinner: dominantSide())
+            delegate?.gameController(self, gameOverWithWinner: GameRecord(winner: dominantSide()), board: board)
         }
         else {
             
@@ -357,7 +353,7 @@ extension GameController {
 
         if turnController.isGameOver {
             
-            delegate?.gameController(self, gameOverWithWinner: dominantSide())
+            delegate?.gameController(self, gameOverWithWinner: GameRecord(winner: dominantSide()), board: board)
         }
         else {
             
@@ -403,10 +399,11 @@ extension GameController {
         
         for location in locations {
             
-            set(disk, at: location, animationDuration: duration)
+            set(SquareState(from: disk), at: location, animationDuration: duration)
         }
         
         try? saveGame()
+        delegate?.gameController(self, boardChanged: board, moves: locations, animationDuration: duration)
         
         if switchToNextTurn {
             

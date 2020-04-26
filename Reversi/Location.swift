@@ -6,15 +6,17 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-public struct Location {
+import Foundation
+
+struct Location {
     
-    public var col: Int
-    public var row: Int
+    var col: Int
+    var row: Int
 }
 
 extension Location {
     
-    public func next(to direction: Direction) -> Location {
+    func next(to direction: Direction) -> Location {
 
         var location = self
         
@@ -39,5 +41,39 @@ extension Location {
         }
         
         return location
+    }
+}
+
+@objc class _LocationBox : NSObject {
+    
+    fileprivate var location: Location
+    
+    fileprivate init(_ location: Location) {
+
+        self.location = location
+    }
+}
+
+extension Location : _ObjectiveCBridgeable {
+    
+    func _bridgeToObjectiveC() -> _LocationBox {
+        
+        return _LocationBox(self)
+    }
+    
+    static func _forceBridgeFromObjectiveC(_ source: _LocationBox, result: inout Location?) {
+        
+        result = source.location
+    }
+    
+    static func _conditionallyBridgeFromObjectiveC(_ source: _LocationBox, result: inout Location?) -> Bool {
+        
+        result = source.location
+        return true
+    }
+    
+    static func _unconditionallyBridgeFromObjectiveC(_ source: _LocationBox?) -> Location {
+        
+        return source!.location
     }
 }

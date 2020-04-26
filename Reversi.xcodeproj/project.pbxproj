@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B171221D2455087000DC5408 /* TurnController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171221C2455087000DC5408 /* TurnController.swift */; };
+		B171221F2455843000DC5408 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171221E2455843000DC5408 /* GameRecord.swift */; };
+		B17122212455868D00DC5408 /* SquareState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17122202455868D00DC5408 /* SquareState.swift */; };
 		B1C4C58A24546A960004C2B7 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58924546A960004C2B7 /* GameState.swift */; };
 		B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58B2454798F0004C2B7 /* PlayerController.swift */; };
 		B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58D24547A2E0004C2B7 /* Players.swift */; };
@@ -47,6 +49,8 @@
 
 /* Begin PBXFileReference section */
 		B171221C2455087000DC5408 /* TurnController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnController.swift; sourceTree = "<group>"; };
+		B171221E2455843000DC5408 /* GameRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
+		B17122202455868D00DC5408 /* SquareState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareState.swift; sourceTree = "<group>"; };
 		B1C4C58924546A960004C2B7 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		B1C4C58B2454798F0004C2B7 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
 		B1C4C58D24547A2E0004C2B7 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
@@ -132,8 +136,10 @@
 			isa = PBXGroup;
 			children = (
 				D642BDD723AA0B5700396732 /* Disk.swift */,
+				B17122202455868D00DC5408 /* SquareState.swift */,
 				B1C4C58924546A960004C2B7 /* GameState.swift */,
 				B1DE08532453B89C00E4D54C /* Location.swift */,
+				B171221E2455843000DC5408 /* GameRecord.swift */,
 				B1DE08552453BCA700E4D54C /* Direction.swift */,
 				B1F4B14D2453D4EA005A1DC7 /* Board.swift */,
 				B1F4B14F2453D86A005A1DC7 /* Square.swift */,
@@ -295,7 +301,9 @@
 				B1DE08542453B89C00E4D54C /* Location.swift in Sources */,
 				B1F4B156245438BF005A1DC7 /* ViewUpdateRequest.swift in Sources */,
 				B1F4B14C2453D43D005A1DC7 /* Player.swift in Sources */,
+				B17122212455868D00DC5408 /* SquareState.swift in Sources */,
 				B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */,
+				B171221F2455843000DC5408 /* GameRecord.swift in Sources */,
 				B1F4B1522453E52C005A1DC7 /* BoardViewDelegate.swift in Sources */,
 				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */,

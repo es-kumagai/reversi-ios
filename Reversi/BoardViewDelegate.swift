@@ -6,7 +6,9 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-protocol BoardViewDelegate: AnyObject {
+import Foundation
+
+@objc protocol BoardViewDelegate: AnyObject {
     
     /// `boardView` の `location` で指定されるセルがタップされたときに呼ばれます。
     /// - Parameter boardView: セルをタップされた `BoardView` インスタンスです。

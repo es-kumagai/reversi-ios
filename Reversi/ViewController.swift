@@ -7,21 +7,8 @@ extension Notification.Name {
 
 class ViewController: UIViewController {
     
-    @IBOutlet private var gameController: GameController! {
-        
-        didSet {
-            
-            gameController.delegate = self
-        }
-    }
-    
-    @IBOutlet private var boardView: BoardView! {
-        
-        didSet {
-            
-            boardView.delegate = self
-        }
-    }
+    @IBOutlet private var gameController: GameController!
+    @IBOutlet private var boardView: BoardView!
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
@@ -84,8 +71,8 @@ class ViewController: UIViewController {
             
             switch request {
                 
-            case .square(disk: let disk, location: let location):
-                self.boardView.set(disk: disk, location: location, animated: true)
+            case .square(state: let state, location: let location):
+                self.boardView.set(square: state, location: location, animated: true)
                 
             case .board(board: let board):
                 self.boardView.set(board: board, animated: true)
@@ -132,9 +119,11 @@ extension ViewController {
     }
     
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
-    func updateCountLabels() {
+    func updateCountLabels(of board: Board) {
+        
         for side in Disk.sides {
-            countLabels[segmentIndex(of: side)].text = "\(gameController.diskCount(of: side))"
+            
+            countLabels[segmentIndex(of: side)].text = "\(board.count(of: side))"
         }
     }
     
@@ -252,29 +241,19 @@ private extension ViewController {
 
 extension ViewController : GameControllerDelegate {
     
-    func gameController(_ controller: GameController, gameWillStart _: Void) {
-        
-    }
-    
     func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn side: Disk) {
 
         clearViewUpdateRequests()
         updateBoard(board)
-        updateCountLabels()
+        updateCountLabels(of: board)
         updateTurnMessage(turn: side)
-        
-        for side in Disk.sides {
-
-            let player = controller.player(of: side)
-            playerControls[segmentIndex(of: side)].selectedSegmentIndex = player.rawValue
-        }
     }
     
-    func gameController(_ controller: GameController, setDisk disk: Disk?, location: Location, animationDuration duration: Double) {
+    func gameController(_ controller: GameController, setSquare state: SquareState, location: Location, animationDuration duration: Double) {
 
         viewUpdateProcessingQueue.async {
             
-            self.viewUpdateRequestQueue.enqueue(.square(disk: disk, location: location))
+            self.viewUpdateRequestQueue.enqueue(.square(state: state, location: location))
             
             if duration != 0 {
 
@@ -283,6 +262,13 @@ extension ViewController : GameControllerDelegate {
         }
     }
     
+    func gameController(_ controller: GameController, boardChanged board: Board, moves: [Location], animationDuration duration: Double) {
+        
+        for side in Disk.sides {
+            
+            countLabels[segmentIndex(of: side)].text = "\(controller.diskCount(of: side))"
+        }
+    }
 
     func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk) {
         
@@ -297,7 +283,6 @@ extension ViewController : GameControllerDelegate {
     func gameController(_ controller: GameController, turnChanged side: Disk) {
         
         updateTurnMessage(turn: side)
-        updateCountLabels()
     }
     
     func gameController(_ controller: GameController, cannotMoveAnyware side: Disk) {
@@ -316,9 +301,9 @@ extension ViewController : GameControllerDelegate {
         present(alertController, animated: true)
     }
     
-    func gameController(_ controller: GameController, gameOverWithWinner side: Disk?) {
+    func gameController(_ controller: GameController, gameOverWithWinner record: GameRecord, board: Board) {
         
-        updateTurnMessage(winner: side)
-        updateCountLabels()
+        updateCountLabels(of: board)
+        updateTurnMessage(winner: record.winner)
     }
 }

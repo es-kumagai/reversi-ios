@@ -54,6 +54,7 @@
                                     <constraint firstAttribute="width" secondItem="zq8-hK-TyQ" secondAttribute="height" multiplier="1:1" id="2W1-wd-IFi"/>
                                 </constraints>
                                 <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Z0p-5t-T9i"/>
                                     <outlet property="gameController" destination="Tcq-mQ-Lh6" id="uDp-Bf-d5g"/>
                                 </connections>
                             </view>
@@ -202,6 +203,7 @@
                 </customObject>
                 <customObject id="Tcq-mQ-Lh6" customClass="GameController" customModule="Reversi" customModuleProvider="target">
                     <connections>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="NGi-pj-wXK"/>
                         <outlet property="playerController" destination="J0g-2h-x9w" id="EgM-vw-nAs"/>
                         <outlet property="turnController" destination="cva-lI-uQd" id="rIZ-nL-fTB"/>
                     </connections>

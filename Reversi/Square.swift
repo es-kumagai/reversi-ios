@@ -9,5 +9,5 @@
 struct Square {
     
     var location: Location
-    var disk: Disk? = nil
+    var state: SquareState = .empty
 }

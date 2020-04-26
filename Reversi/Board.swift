@@ -54,7 +54,7 @@ extension Board {
     func count(of side: Disk) -> Int {
         
         return squares
-            .filter { $0.disk == side }
+            .filter { $0.state.side == side }
             .count
     }
 
@@ -76,16 +76,16 @@ extension Board {
     /// `location` で指定された升目に `disk` を設定します。
     /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
     /// - Parameter location: セルの位置です。
-    subscript(_ location: Location) -> Disk? {
+    subscript(_ location: Location) -> SquareState {
         
         get {
             
-            return squares[squareIndex(of: location)].disk
+            return squares[squareIndex(of: location)].state
         }
         
-        set (disk) {
+        set (state) {
 
-            squares[squareIndex(of: location)].disk = disk
+            squares[squareIndex(of: location)].state = state
         }
     }
     
@@ -94,7 +94,7 @@ extension Board {
         
         for square in squares {
             
-            self[square.location] = nil
+            self[square.location] = .empty
         }
         
         self[Location(col: cols / 2 - 1, row: rows / 2 - 1)] = .light
@@ -125,5 +125,39 @@ extension Board {
     func contains(row: Int) -> Bool {
         
         return (0 ..< rows).contains(row)
+    }
+}
+
+@objc class _BoardBox : NSObject {
+    
+    fileprivate var board: Board
+    
+    fileprivate init(_ board: Board) {
+
+        self.board = board
+    }
+}
+
+extension Board : _ObjectiveCBridgeable {
+    
+    func _bridgeToObjectiveC() -> _BoardBox {
+        
+        return _BoardBox(self)
+    }
+    
+    static func _forceBridgeFromObjectiveC(_ source: _BoardBox, result: inout Board?) {
+        
+        result = source.board
+    }
+    
+    static func _conditionallyBridgeFromObjectiveC(_ source: _BoardBox, result: inout Board?) -> Bool {
+        
+        result = source.board
+        return true
+    }
+    
+    static func _unconditionallyBridgeFromObjectiveC(_ source: _BoardBox?) -> Board {
+        
+        return source!.board
     }
 }

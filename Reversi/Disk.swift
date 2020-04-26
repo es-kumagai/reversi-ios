@@ -1,9 +1,9 @@
-public enum Disk {
-    case dark
-    case light
-}
+import Foundation
 
-extension Disk: Hashable {}
+@objc public enum Disk : Int {
+    case dark = 0
+    case light = 1
+}
 
 extension Disk {
     /// `Disk` のすべての値を列挙した `Array` 、 `[.dark, .light]` を返します。
@@ -25,32 +25,3 @@ extension Disk {
     }
 }
 
-extension Disk : CustomStringConvertible {
-    
-    public var description: String {
-        
-        switch self {
-            
-        case .dark:
-            return "x"
-            
-        case .light:
-            return "o"
-        }
-    }
-    
-    init?(description: String) {
-        
-        switch description {
-            
-        case "x":
-            self = .dark
-            
-        case "o":
-            self = .light
-            
-        default:
-            return nil
-        }
-    }
-}

@@ -10,7 +10,7 @@ public class BoardView: UIView {
     private var actions: [CellSelectionAction] = []
     
     /// セルがタップされたときの挙動を移譲するためのオブジェクトです。
-    weak var delegate: BoardViewDelegate?
+    @IBOutlet weak var delegate: BoardViewDelegate?
     
     public override func awakeFromNib() {
         
@@ -97,20 +97,20 @@ public class BoardView: UIView {
 
 extension BoardView {
     
-    func set(disk: Disk?, location: Location, animated: Bool) {
+    func set(square: SquareState, location: Location, animated: Bool) {
 
         guard let cellView = cellView(at: location) else {
             preconditionFailure() // FIXME: Add a message.
         }
         
-        cellView.setDisk(disk, animated: animated)
+        cellView.setDisk(square.side, animated: animated)
     }
     
     func set(board: Board, animated: Bool) {
         
         for square in board.squares {
             
-            set(disk: square.disk, location: square.location, animated: animated)
+            set(square: square.state, location: square.location, animated: animated)
         }
     }
 }

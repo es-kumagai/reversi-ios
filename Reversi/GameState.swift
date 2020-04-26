@@ -14,31 +14,36 @@ enum GameState {
 
 extension GameState : CustomStringConvertible {
     
-    var description: String {
+        init?(description: String) {
+            
+            switch description {
+                
+            case "x":
+                self = .playing(side: .dark)
+                
+            case "o":
+                self = .playing(side: .light)
+                
+            case "-":
+                self = .over
+                
+            default:
+                return nil
+            }
+        }
         
-        switch self {
+        var description: String {
             
-        case .playing(side: let side):
-            return side.description
-            
-        case .over:
-            return "-"
+            switch self {
+                
+            case .playing(.dark):
+                return "x"
+                
+            case .playing(.light):
+                return "o"
+                
+            case .over:
+                return "-"
+            }
         }
     }
-    
-    init?(description: String) {
-        
-        if let side = Disk(description: description) {
-            
-            self = .playing(side: side)
-        }
-        else if description == "-" {
-            
-            self = .over
-        }
-        else {
-            
-            return nil
-        }
-    }
-}

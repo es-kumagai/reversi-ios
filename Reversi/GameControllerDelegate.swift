@@ -8,14 +8,14 @@
 
 import Foundation
 
-protocol GameControllerDelegate : class {
+@objc protocol GameControllerDelegate : class {
     
     func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk)
     func gameController(_ controller: GameController, ponderingDidEndBySide side: Disk)
     func gameController(_ controller: GameController, turnChanged side: Disk)
     func gameController(_ controller: GameController, cannotMoveAnyware side: Disk)
-    func gameController(_ controller: GameController, gameOverWithWinner side: Disk?)
-    func gameController(_ controller: GameController, gameWillStart _: Void)
+    func gameController(_ controller: GameController, gameOverWithWinner record: GameRecord, board: Board)
     func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn: Disk)
-    func gameController(_ controller: GameController, setDisk disk: Disk?, location: Location, animationDuration duration: Double)
+    func gameController(_ controller: GameController, setSquare state: SquareState, location: Location, animationDuration duration: Double)
+    func gameController(_ controller: GameController, boardChanged board: Board, moves: [Location], animationDuration duration: Double)
 }
