@@ -21,6 +21,7 @@ class GameController : NSObject {
     
     @IBOutlet private var playerController: PlayerController!
     @IBOutlet private var turnController: TurnController!
+    @IBOutlet private var fileController: FileController!
     
     private var playerCancellers: [Disk: Canceller] = [:]
     
@@ -191,107 +192,52 @@ extension GameController {
 
 extension GameController {
     
-    enum FileIOError: Error {
-        case write(path: String, cause: Error?)
-        case read(path: String, cause: Error?)
-    }
-    
-    private var path: String {
-        (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
-    }
-    
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
-        var output: String = ""
-        output += turnController.currentState.description
-        for side in Disk.sides {
+        
+        try fileController.writeToFile {
             
-            let player = playerController.players[of: side]
-            output += player.rawValue.description
-        }
-        output += "\n"
-        
-        for squaresPerRow in board.squaresPerRow {
-            for square in squaresPerRow {
-                output += square.state.description
-            }
-            output += "\n"
-        }
-        
-        do {
-            try output.write(toFile: path, atomically: true, encoding: .utf8)
-        } catch let error {
-            throw FileIOError.read(path: path, cause: error)
+            turnController.currentState     // Turn
+            playerController.players        // Players
+            board                           // Board
         }
     }
     
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
         
-        let input = try String(contentsOfFile: path, encoding: .utf8)
-        var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
-        
-        guard var line = lines.popFirst() else {
-            throw FileIOError.read(path: path, cause: nil)
-        }
-        
-        do {
-            // turn
-            guard
-                let stateDescription = line.popFirst(),
-                let state = GameState(description: String(stateDescription))
-                else {
-                    throw FileIOError.read(path: path, cause: nil)
-            }
-            
-            switch state {
-                
-            case .playing(side: let side):
-                turnController.turnChange(to: side, reason: .resume)
-                
-            case .over:
-                turnController.turnReset()
-            }
-        }
-        
-        // players
-        for side in Disk.sides {
-            guard
-                let playerSymbol = line.popFirst(),
-                let playerNumber = Int(playerSymbol.description),
-                let player = Player(rawValue: playerNumber)
-                else {
-                    throw FileIOError.read(path: path, cause: nil)
-            }
-            
-            playerController.changePlayer(of: side, to: player)
-        }
-        
-        do { // board
-            guard lines.count == board.rows else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            
-            var row = 0
-            while let line = lines.popFirst() {
-                var col = 0
-                for character in line {
-                    let state = SquareState(description: "\(character)")!
-                    set(state, at: Location(col: col, row: row), animationDuration: 0)
-                    col += 1
-                }
-                guard col == board.cols else {
-                    throw FileIOError.read(path: path, cause: nil)
-                }
-                row += 1
-            }
-            guard row == board.rows else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            
-            allowPlacingOnThisTurn = true
-        }
+        let input = try fileController.readFromFile()
 
+        do {
+            
+            let deserialized = try Deserializer.deserialization(input)
+            
+            // Turn
+            switch deserialized.turn {
+                
+                case .playing(side: let side):
+                    turnController.turnChange(to: side, reason: .resume)
+                    
+                case .over:
+                    turnController.turnReset()
+            }
+            
+            // Players
+            for side in Disk.sides {
+
+                playerController.changePlayer(of: side, to: deserialized.players[of: side])
+            }
+            
+            // Board
+            board = deserialized.board
+        }
+        catch {
+        
+            throw FileIOError.read(path: fileController.file, cause: error)
+        }
+        
+        allowPlacingOnThisTurn = true
+        
         if turnController.isGameOver {
 
             delegate?.gameController(self, gameOverWithWinner: GameRecord(winner: dominantSide()), board: board)

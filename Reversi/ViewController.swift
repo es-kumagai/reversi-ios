@@ -259,7 +259,7 @@ extension ViewController : GameControllerDelegate {
         
         for side in Disk.sides {
             
-            countLabels[segmentIndex(of: side)].text = "\(controller.diskCount(of: side))"
+            countLabels[segmentIndex(of: side)].text = "\(board.count(of: side))"
         }
     }
 
@@ -296,6 +296,7 @@ extension ViewController : GameControllerDelegate {
     
     func gameController(_ controller: GameController, gameOverWithWinner record: GameRecord, board: Board) {
         
+        updateBoard(board)
         updateCountLabels(of: board)
         updateTurnMessage(winner: record.winner)
     }
