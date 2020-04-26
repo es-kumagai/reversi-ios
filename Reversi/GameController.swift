@@ -38,7 +38,7 @@ class GameController : NSObject {
         
         board.reset()
         
-        delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark)
+        delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark, players: playerController.players)
     }
     
     /// プレイヤーの行動を待ちます。
@@ -298,7 +298,7 @@ extension GameController {
         }
         else {
             
-            delegate?.gameController(self, gameDidStartWithBoard: board, turn: turnController.currentTurn!)
+            delegate?.gameController(self, gameDidStartWithBoard: board, turn: turnController.currentTurn!, players: playerController.players)
         }
     }
     

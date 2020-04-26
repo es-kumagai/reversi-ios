@@ -211,42 +211,35 @@ private extension ViewController {
     
     func segmentIndex(of side: Disk) -> Int {
         
-        switch side {
-            
-        case .dark:
-            return 0
-            
-        case .light:
-            return 1
-        }
+        return side.rawValue
     }
     
     func side(of segmentControl: UISegmentedControl) -> Disk {
-        
+
         let index = playerControls.firstIndex(of: segmentControl)!
-        
-        switch index {
+
+        guard let side = Disk(rawValue: index) else {
             
-        case 0:
-            return .dark
-            
-        case 1:
-            return .light
-            
-        default:
             fatalError("Invalid index: \(index)")
         }
+        
+        return side
     }
 }
 
 extension ViewController : GameControllerDelegate {
     
-    func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn side: Disk) {
+    func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn side: Disk, players: Players) {
 
         clearViewUpdateRequests()
         updateBoard(board)
         updateCountLabels(of: board)
         updateTurnMessage(turn: side)
+        
+        for side in Disk.sides {
+            
+            playerControls[segmentIndex(of: side)].selectedSegmentIndex = players[of: side].rawValue
+        }
     }
     
     func gameController(_ controller: GameController, setSquare state: SquareState, location: Location, animationDuration duration: Double) {
