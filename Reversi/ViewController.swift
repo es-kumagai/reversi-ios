@@ -41,7 +41,7 @@ class ViewController: UIViewController {
     private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
     private var viewUpdateRequestQueue: Queue<ViewUpdateRequest> = []
     private var viewUpdateMessageLoopSource: DispatchSourceTimer!
-    private var viewUpdateMessageLoopDuration = 0.02
+    private var viewUpdateMessageLoopDuration = 0.005
     private var viewUpdateMessageLoopSleepCount = 0 as Double
     
     
@@ -265,7 +265,7 @@ extension ViewController : GameControllerDelegate {
         
         for side in Disk.sides {
 
-            let player = gameController.player(of: side)
+            let player = controller.player(of: side)
             playerControls[segmentIndex(of: side)].selectedSegmentIndex = player.rawValue
         }
     }
@@ -308,9 +308,9 @@ extension ViewController : GameControllerDelegate {
             preferredStyle: .alert
         )
         
-        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { [unowned self] _ in
-            self.gameController.nextTurn(withReason: .passed)
-            self.gameController.waitForPlayer(afterDelay: 0)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { _ in
+            controller.nextTurn(withReason: .passed)
+            controller.waitForPlayer(afterDelay: 0)
         })
         
         present(alertController, animated: true)
