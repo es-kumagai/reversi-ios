@@ -138,24 +138,30 @@ extension ViewController {
         }
     }
     
-    /// 現在の状況に応じてメッセージを表示します。
-    func updateMessageViews() {
-        switch gameController.turn {
-        case .some(let side):
+    /// 勝敗を表示します。
+    func updateTurnMessage(winner side: Disk?) {
+        
+        switch side {
+            
+        case .some(let winner):
             messageDiskSizeConstraint.constant = messageDiskSize
-            messageDiskView.disk = side
-            messageLabel.text = "'s turn"
+            messageDiskView.disk = winner
+            messageLabel.text = " won"
+            
         case .none:
-            if let winner = gameController.dominantSide() {
-                messageDiskSizeConstraint.constant = messageDiskSize
-                messageDiskView.disk = winner
-                messageLabel.text = " won"
-            } else {
-                messageDiskSizeConstraint.constant = 0
-                messageLabel.text = "Tied"
-            }
+            messageDiskSizeConstraint.constant = 0
+            messageLabel.text = "Tied"
         }
     }
+    
+    /// 現在のターン情報を表示します。
+    func updateTurnMessage(turn side: Disk) {
+        
+        messageDiskSizeConstraint.constant = messageDiskSize
+        messageDiskView.disk = side
+        messageLabel.text = "'s turn"
+    }
+
 }
 
 // MARK: Inputs
@@ -250,12 +256,12 @@ extension ViewController : GameControllerDelegate {
         
     }
     
-    func gameController(_ controller: GameController, gameDidStartWithBoard board: Board) {
+    func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn side: Disk) {
 
         clearViewUpdateRequests()
         updateBoard(board)
-        updateMessageViews()
         updateCountLabels()
+        updateTurnMessage(turn: side)
         
         for side in Disk.sides {
 
@@ -290,13 +296,11 @@ extension ViewController : GameControllerDelegate {
     
     func gameController(_ controller: GameController, turnChanged side: Disk) {
         
+        updateTurnMessage(turn: side)
         updateCountLabels()
-        updateMessageViews()
     }
     
-    func gameController(_ controller: GameController, turnChangedButCannotMoveAnyware side: Disk) {
-        
-        updateMessageViews()
+    func gameController(_ controller: GameController, cannotMoveAnyware side: Disk) {
         
         let alertController = UIAlertController(
             title: "Pass",
@@ -305,7 +309,8 @@ extension ViewController : GameControllerDelegate {
         )
         
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { [unowned self] _ in
-            self.gameController.nextTurn(afterDelay: 0)
+            self.gameController.nextTurn(withReason: .passed)
+            self.gameController.waitForPlayer(afterDelay: 0)
         })
         
         present(alertController, animated: true)
@@ -313,6 +318,7 @@ extension ViewController : GameControllerDelegate {
     
     func gameController(_ controller: GameController, gameOverWithWinner side: Disk?) {
         
-        updateMessageViews()
+        updateTurnMessage(winner: side)
+        updateCountLabels()
     }
 }

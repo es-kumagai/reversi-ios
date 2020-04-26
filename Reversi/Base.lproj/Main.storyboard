@@ -203,8 +203,10 @@
                 <customObject id="Tcq-mQ-Lh6" customClass="GameController" customModule="Reversi" customModuleProvider="target">
                     <connections>
                         <outlet property="playerController" destination="J0g-2h-x9w" id="EgM-vw-nAs"/>
+                        <outlet property="turnController" destination="cva-lI-uQd" id="rIZ-nL-fTB"/>
                     </connections>
                 </customObject>
+                <customObject id="cva-lI-uQd" customClass="TurnController" customModule="Reversi" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
         </scene>

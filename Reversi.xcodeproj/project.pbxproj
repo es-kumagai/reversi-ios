@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B171221D2455087000DC5408 /* TurnController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171221C2455087000DC5408 /* TurnController.swift */; };
 		B1C4C58A24546A960004C2B7 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58924546A960004C2B7 /* GameState.swift */; };
 		B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58B2454798F0004C2B7 /* PlayerController.swift */; };
 		B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58D24547A2E0004C2B7 /* Players.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B171221C2455087000DC5408 /* TurnController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnController.swift; sourceTree = "<group>"; };
 		B1C4C58924546A960004C2B7 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		B1C4C58B2454798F0004C2B7 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
 		B1C4C58D24547A2E0004C2B7 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			children = (
 				B1F4B1462453CAD3005A1DC7 /* GameController.swift */,
 				B1C4C58F24547EEC0004C2B7 /* GameControllerDelegate.swift */,
+				B171221C2455087000DC5408 /* TurnController.swift */,
 				B1C4C58B2454798F0004C2B7 /* PlayerController.swift */,
 				B1C4C58D24547A2E0004C2B7 /* Players.swift */,
 			);
@@ -296,6 +299,7 @@
 				B1F4B1522453E52C005A1DC7 /* BoardViewDelegate.swift in Sources */,
 				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */,
+				B171221D2455087000DC5408 /* TurnController.swift in Sources */,
 				B1F4B14E2453D4EA005A1DC7 /* Board.swift in Sources */,
 				D642BDD823AA0B5700396732 /* Disk.swift in Sources */,
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
