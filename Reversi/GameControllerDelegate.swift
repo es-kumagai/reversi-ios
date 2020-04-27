@@ -16,6 +16,6 @@ import Foundation
     func gameController(_ controller: GameController, cannotMoveAnyware side: Disk)
     func gameController(_ controller: GameController, gameOverWithWinner record: GameRecord, board: Board)
     func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn: Disk, players: Players)
-    func gameController(_ controller: GameController, setSquare state: SquareState, location: Location, animationDuration duration: Double)
+    func gameController(_ controller: GameController, setSquare state: Square.State, location: Location, animationDuration duration: Double)
     func gameController(_ controller: GameController, boardChanged board: Board, moves: [Location], animationDuration duration: Double)
 }

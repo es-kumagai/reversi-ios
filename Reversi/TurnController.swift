@@ -11,7 +11,7 @@ import Foundation
 class TurnController : NSObject {
     
     /// 試合中でどちらの色のプレイヤーのターンかを `.playing` で表します。ゲーム終了時は `.over` です。
-    private(set) var currentState: GameState = .over
+    private(set) var currentState: TurnState = .over
 
     private(set) var turnChangedReason: ChangedReason = .resume
 

@@ -9,7 +9,7 @@
 @_functionBuilder
 enum Serialization {
     
-    static func buildBlock(_ turn: GameState, _ players: Players, _ board: Board) -> String {
+    static func buildBlock(_ turn: TurnState, _ players: Players, _ board: Board) -> String {
         
         return Serializer.serialization(turn: turn, players: players, board: board)
     }
@@ -27,7 +27,7 @@ private enum MultilineString {
 enum Serializer {
     
     @MultilineString
-    static func serialization(turn: GameState, players: Players, board: Board) -> String {
+    static func serialization(turn: TurnState, players: Players, board: Board) -> String {
         
         serialization(turn: turn) + serialization(players: players)
         serialization(board: board)
@@ -36,7 +36,7 @@ enum Serializer {
 
 private extension Serializer {
     
-    static func serialization(turn: GameState) -> String {
+    static func serialization(turn: TurnState) -> String {
         
         return turn.description
     }

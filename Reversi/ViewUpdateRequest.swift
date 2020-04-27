@@ -8,7 +8,7 @@
 
 enum ViewUpdateRequest {
     
-    case square(state: SquareState, location: Location)
+    case square(state: Square.State, location: Location)
     case board(board: Board)
     case sleep(interval: Double)
 }

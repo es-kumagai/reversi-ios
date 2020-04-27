@@ -109,7 +109,7 @@ class GameController : NSObject {
     /// - Parameter state: 升目に設定される新しい状態です。
     /// - Parameter location: セルの位置です。
     /// - Parameter animationDuration: アニメーション表示時の待ち時間です。
-    func set(_ state: SquareState, at location: Location, animationDuration duration: Double) {
+    func set(_ state: Square.State, at location: Location, animationDuration duration: Double) {
         
         guard board.contains(location) else {
             
@@ -345,7 +345,7 @@ extension GameController {
         
         for location in locations {
             
-            set(SquareState(from: disk), at: location, animationDuration: duration)
+            set(Square.State(from: disk), at: location, animationDuration: duration)
         }
         
         try? saveGame()

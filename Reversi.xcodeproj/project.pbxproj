@@ -11,11 +11,11 @@
 		B171221F2455843000DC5408 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171221E2455843000DC5408 /* GameRecord.swift */; };
 		B17122212455868D00DC5408 /* SquareState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17122202455868D00DC5408 /* SquareState.swift */; };
 		B1712224245592DB00DC5408 /* FileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1712223245592DB00DC5408 /* FileController.swift */; };
-		B1712226245592F900DC5408 /* MessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1712225245592F900DC5408 /* MessageController.swift */; };
+		B1712226245592F900DC5408 /* ViewUpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1712225245592F900DC5408 /* ViewUpdateController.swift */; };
 		B171222B2455E6C200DC5408 /* Serializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222A2455E6C200DC5408 /* Serializer.swift */; };
 		B171222D2455E79200DC5408 /* Deserializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222C2455E79200DC5408 /* Deserializer.swift */; };
 		B171222F2455E96300DC5408 /* SerializationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222E2455E96300DC5408 /* SerializationError.swift */; };
-		B1C4C58A24546A960004C2B7 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58924546A960004C2B7 /* GameState.swift */; };
+		B1C4C58A24546A960004C2B7 /* TurnState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58924546A960004C2B7 /* TurnState.swift */; };
 		B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58B2454798F0004C2B7 /* PlayerController.swift */; };
 		B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58D24547A2E0004C2B7 /* Players.swift */; };
 		B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58F24547EEC0004C2B7 /* GameControllerDelegate.swift */; };
@@ -40,6 +40,7 @@
 		D642BDD623AA0B3900396732 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD523AA0B3900396732 /* CellView.swift */; };
 		D642BDD823AA0B5700396732 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
 		D642BDDC23AA137C00396732 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDDB23AA137C00396732 /* BoardView.swift */; };
+		DA89B23F2456C4D00014648A /* ViewUpdateControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,11 +58,11 @@
 		B171221E2455843000DC5408 /* GameRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		B17122202455868D00DC5408 /* SquareState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareState.swift; sourceTree = "<group>"; };
 		B1712223245592DB00DC5408 /* FileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileController.swift; sourceTree = "<group>"; };
-		B1712225245592F900DC5408 /* MessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageController.swift; sourceTree = "<group>"; };
+		B1712225245592F900DC5408 /* ViewUpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateController.swift; sourceTree = "<group>"; };
 		B171222A2455E6C200DC5408 /* Serializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Serializer.swift; sourceTree = "<group>"; };
 		B171222C2455E79200DC5408 /* Deserializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deserializer.swift; sourceTree = "<group>"; };
 		B171222E2455E96300DC5408 /* SerializationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerializationError.swift; sourceTree = "<group>"; };
-		B1C4C58924546A960004C2B7 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		B1C4C58924546A960004C2B7 /* TurnState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnState.swift; sourceTree = "<group>"; };
 		B1C4C58B2454798F0004C2B7 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
 		B1C4C58D24547A2E0004C2B7 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
 		B1C4C58F24547EEC0004C2B7 /* GameControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameControllerDelegate.swift; sourceTree = "<group>"; };
@@ -90,6 +91,7 @@
 		D642BDD523AA0B3900396732 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		D642BDD723AA0B5700396732 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
 		D642BDDB23AA137C00396732 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateControllerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +131,8 @@
 				B1C4C58D24547A2E0004C2B7 /* Players.swift */,
 				B1C4C58B2454798F0004C2B7 /* PlayerController.swift */,
 				B1712223245592DB00DC5408 /* FileController.swift */,
-				B1712225245592F900DC5408 /* MessageController.swift */,
+				B1712225245592F900DC5408 /* ViewUpdateController.swift */,
+				DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -159,7 +162,7 @@
 			children = (
 				D642BDD723AA0B5700396732 /* Disk.swift */,
 				B17122202455868D00DC5408 /* SquareState.swift */,
-				B1C4C58924546A960004C2B7 /* GameState.swift */,
+				B1C4C58924546A960004C2B7 /* TurnState.swift */,
 				B1DE08532453B89C00E4D54C /* Location.swift */,
 				B171221E2455843000DC5408 /* GameRecord.swift */,
 				B1DE08552453BCA700E4D54C /* Direction.swift */,
@@ -329,7 +332,7 @@
 				B171221F2455843000DC5408 /* GameRecord.swift in Sources */,
 				B1F4B1522453E52C005A1DC7 /* BoardViewDelegate.swift in Sources */,
 				B1712224245592DB00DC5408 /* FileController.swift in Sources */,
-				B1712226245592F900DC5408 /* MessageController.swift in Sources */,
+				B1712226245592F900DC5408 /* ViewUpdateController.swift in Sources */,
 				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */,
 				B171222F2455E96300DC5408 /* SerializationError.swift in Sources */,
@@ -340,11 +343,12 @@
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
 				D642BDDC23AA137C00396732 /* BoardView.swift in Sources */,
 				B1F4B1542454369A005A1DC7 /* Queue.swift in Sources */,
+				DA89B23F2456C4D00014648A /* ViewUpdateControllerDelegate.swift in Sources */,
 				B1F4B1502453D86A005A1DC7 /* Square.swift in Sources */,
 				D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */,
 				B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */,
 				B171222D2455E79200DC5408 /* Deserializer.swift in Sources */,
-				B1C4C58A24546A960004C2B7 /* GameState.swift in Sources */,
+				B1C4C58A24546A960004C2B7 /* TurnState.swift in Sources */,
 				D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */,
 				B1DE08562453BCA700E4D54C /* Direction.swift in Sources */,
 			);

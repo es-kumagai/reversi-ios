@@ -187,6 +187,7 @@
                         <outlet property="messageDiskSizeConstraint" destination="gHu-Ly-73K" id="52y-fo-Ths"/>
                         <outlet property="messageDiskView" destination="xhS-zB-FaD" id="Cel-dc-EWk"/>
                         <outlet property="messageLabel" destination="nHv-pJ-hrU" id="bqV-9P-ADo"/>
+                        <outlet property="viewUpdateController" destination="Wxq-Ms-lV8" id="nPh-6Y-xmy"/>
                         <outletCollection property="countLabels" destination="NGE-KP-oHh" collectionClass="NSMutableArray" id="aJN-mC-RHo"/>
                         <outletCollection property="countLabels" destination="IMh-5o-Uqc" collectionClass="NSMutableArray" id="XJm-Mh-BhF"/>
                         <outletCollection property="playerActivityIndicators" destination="VTM-mY-aFg" collectionClass="NSMutableArray" id="Ale-OR-NEC"/>
@@ -211,6 +212,11 @@
                 </customObject>
                 <customObject id="cva-lI-uQd" customClass="TurnController" customModule="Reversi" customModuleProvider="target"/>
                 <customObject id="wIY-8Y-uGN" customClass="FileController" customModule="Reversi" customModuleProvider="target"/>
+                <customObject id="Wxq-Ms-lV8" customClass="ViewUpdateController" customModule="Reversi" customModuleProvider="target">
+                    <connections>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="hje-Fp-dTK"/>
+                    </connections>
+                </customObject>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
         </scene>

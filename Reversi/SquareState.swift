@@ -8,14 +8,17 @@
 
 import Foundation
 
-@objc enum SquareState : Int {
+extension Square {
     
-    case dark = 0
-    case light = 1
-    case empty = -1
+    @objc enum State : Int {
+        
+        case dark = 0
+        case light = 1
+        case empty = -1
+    }
 }
 
-extension SquareState {
+extension Square.State {
  
     var side: Disk? {
         
@@ -33,7 +36,7 @@ extension SquareState {
     }
 }
 
-extension SquareState : CustomStringConvertible {
+extension Square.State : CustomStringConvertible {
     
     init(from disk: Disk?) {
         

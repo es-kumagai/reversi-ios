@@ -10,7 +10,7 @@ import Foundation
 
 enum Deserializer {
     
-    static func deserialization(_ string: String) throws -> (turn: GameState, players: Players, board: Board) {
+    static func deserialization(_ string: String) throws -> (turn: TurnState, players: Players, board: Board) {
         
         let components = try self.components(from: string)
         
@@ -40,9 +40,9 @@ private extension Deserializer {
         return (turn, players, board)
     }
     
-    static func deserialization(turn string: String) throws -> GameState {
+    static func deserialization(turn string: String) throws -> TurnState {
         
-        guard let result = GameState(description: String(string)) else {
+        guard let result = TurnState(description: String(string)) else {
             
             throw SerializationError.deserializationFailure("Invalid serialized turn string: \(string)")
         }
@@ -81,9 +81,9 @@ private extension Deserializer {
         
         for (row, string) in strings.enumerated() {
             
-            let squaresPerRow = try string.map { (symbol) -> SquareState in
+            let squaresPerRow = try string.map { (symbol) -> Square.State in
                 
-                guard let square = SquareState(description: String(symbol)) else {
+                guard let square = Square.State(description: String(symbol)) else {
                     
                     throw SerializationError.deserializationFailure("Invalid serialized square: \(symbol)")
                 }

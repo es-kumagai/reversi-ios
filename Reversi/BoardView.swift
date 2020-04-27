@@ -97,7 +97,7 @@ public class BoardView: UIView {
 
 extension BoardView {
     
-    func set(square: SquareState, location: Location, animated: Bool) {
+    func set(square: Square.State, location: Location, animated: Bool) {
 
         guard let cellView = cellView(at: location) else {
             preconditionFailure() // FIXME: Add a message.

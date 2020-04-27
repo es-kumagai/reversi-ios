@@ -7,12 +7,15 @@ extension Notification.Name {
 
 class ViewController: UIViewController {
     
+    @IBOutlet private var viewUpdateController: ViewUpdateController!
     @IBOutlet private var gameController: GameController!
+    
     @IBOutlet private var boardView: BoardView!
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
     @IBOutlet private var messageDiskSizeConstraint: NSLayoutConstraint!
+    
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
     /// `messageDiskSizeConstraint.constant` を `0` に設定します。
@@ -25,64 +28,23 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
-    private var viewUpdateProcessingQueue = DispatchQueue(label: "reversi.viewcontroller.animation")
-    private var viewUpdateRequestQueue: Queue<ViewUpdateRequest> = []
-    private var viewUpdateMessageLoopSource: DispatchSourceTimer!
-    private var viewUpdateMessageLoopDuration = 0.005
-    private var viewUpdateMessageLoopSleepCount = 0 as Double
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         messageDiskSize = messageDiskSizeConstraint.constant
         
-        let source = DispatchSource.makeTimerSource(flags: [], queue: viewUpdateProcessingQueue)
-        
-        source.schedule(deadline: .now(), repeating: viewUpdateMessageLoopDuration)
-        source.setEventHandler(handler: diskChangeRequestMessageLoop)
-
-        viewUpdateMessageLoopSource = source
-        viewUpdateMessageLoopSource.resume()
-        
         do {
+            
             try gameController.loadGame()
-        } catch _ {
+        }
+        catch _ {
+            
             gameController.newGame()
         }
     }
     
     private var viewHasAppeared: Bool = false
-    
-    func diskChangeRequestMessageLoop() {
         
-        guard viewUpdateMessageLoopSleepCount == 0 else {
-        
-            viewUpdateMessageLoopSleepCount = max(viewUpdateMessageLoopSleepCount - 1, 0)
-            return
-        }
-        
-        guard let request = viewUpdateRequestQueue.dequeue() else {
-            
-            return
-        }
-        
-        DispatchQueue.main.async {
-            
-            switch request {
-                
-            case .square(state: let state, location: let location):
-                self.boardView.set(square: state, location: location, animated: true)
-                
-            case .board(board: let board):
-                self.boardView.set(board: board, animated: true)
-                
-            case .sleep(interval: let interval):
-                self.viewUpdateMessageLoopSleepCount = interval / self.viewUpdateMessageLoopDuration
-            }
-        }
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -95,27 +57,25 @@ class ViewController: UIViewController {
 
 // MARK: Views
 
-extension ViewController {
-
-    /// キューに溜まってる更新リクエストを消去します。
-    func clearViewUpdateRequests() {
+extension ViewController : ViewUpdateControllerDelegate {
     
-        viewUpdateProcessingQueue.async {
-            
-            self.viewUpdateRequestQueue.clear()
-            self.viewUpdateMessageLoopSleepCount = 0
-        }
+    func viewUpdateController(_ controller: ViewUpdateController, updateSquare state: Square.State, location: Location, animated: Bool) {
+        
+        boardView.set(square: state, location: location, animated: true)
     }
+    
+    func viewUpdateController(_ controller: ViewUpdateController, updateBoard board: Board, animated: Bool) {
+        
+        boardView.set(board: board, animated: true)
+    }
+}
+
+extension ViewController {
     
     /// 盤面を一括で更新します。
     func updateBoard(_ board: Board) {
         
-        let request = ViewUpdateRequest.board(board: board)
-        
-        viewUpdateProcessingQueue.async {
-            
-            self.viewUpdateRequestQueue.enqueue(request)
-        }
+        viewUpdateController.request(.board(board: board))
     }
     
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
@@ -166,10 +126,9 @@ extension ViewController {
             message: "Do you really want to reset the game?",
             preferredStyle: .alert
         )
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
-        alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-                        
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alertController.addAction(UIAlertAction(title: "OK", style: .default) { [unowned self] _ in
+
             self.gameController.newGame()
             self.gameController.waitForPlayer(afterDelay: 0)
             
@@ -231,7 +190,7 @@ extension ViewController : GameControllerDelegate {
     
     func gameController(_ controller: GameController, gameDidStartWithBoard board: Board, turn side: Disk, players: Players) {
 
-        clearViewUpdateRequests()
+        viewUpdateController.resetRequests()
         updateBoard(board)
         updateCountLabels(of: board)
         updateTurnMessage(turn: side)
@@ -242,17 +201,10 @@ extension ViewController : GameControllerDelegate {
         }
     }
     
-    func gameController(_ controller: GameController, setSquare state: SquareState, location: Location, animationDuration duration: Double) {
+    func gameController(_ controller: GameController, setSquare state: Square.State, location: Location, animationDuration duration: Double) {
 
-        viewUpdateProcessingQueue.async {
-            
-            self.viewUpdateRequestQueue.enqueue(.square(state: state, location: location))
-            
-            if duration != 0 {
-
-                self.viewUpdateRequestQueue.enqueue(.sleep(interval: duration))
-            }
-        }
+        viewUpdateController.request(.square(state: state, location: location))
+        viewUpdateController.request(.sleep(interval: duration))
     }
     
     func gameController(_ controller: GameController, boardChanged board: Board, moves: [Location], animationDuration duration: Double) {

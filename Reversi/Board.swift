@@ -76,7 +76,7 @@ extension Board {
     /// `location` で指定された升目に `disk` を設定します。
     /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
     /// - Parameter location: セルの位置です。
-    subscript(_ location: Location) -> SquareState {
+    subscript(_ location: Location) -> Square.State {
         
         get {
             
