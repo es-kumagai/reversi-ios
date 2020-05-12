@@ -45,6 +45,8 @@
 		D642BDD623AA0B3900396732 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD523AA0B3900396732 /* CellView.swift */; };
 		D642BDD823AA0B5700396732 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
 		D642BDDC23AA137C00396732 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDDB23AA137C00396732 /* BoardView.swift */; };
+		DA6F5A9E246943FE00120F49 /* PlayerControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6F5A9D246943FE00120F49 /* PlayerControllerDelegate.swift */; };
+		DA6F5AA224694AF400120F49 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6F5AA124694AF400120F49 /* Player.swift */; };
 		DA89B23F2456C4D00014648A /* ViewUpdateControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -101,6 +103,8 @@
 		D642BDD523AA0B3900396732 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		D642BDD723AA0B5700396732 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
 		D642BDDB23AA137C00396732 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		DA6F5A9D246943FE00120F49 /* PlayerControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControllerDelegate.swift; sourceTree = "<group>"; };
+		DA6F5AA124694AF400120F49 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateControllerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -350,10 +354,10 @@
 				B17CE42C246AB47A00D55F56 /* ManualPlayer.swift in Sources */,
 				B1712224245592DB00DC5408 /* FileController.swift in Sources */,
 				B1712226245592F900DC5408 /* ViewUpdateController.swift in Sources */,
-				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */,
 				B17CE42A246AB21100D55F56 /* PlayerDelegate.swift in Sources */,
 				B171222F2455E96300DC5408 /* SerializationError.swift in Sources */,
+				DA6F5AA224694AF400120F49 /* Player.swift in Sources */,
 				B171221D2455087000DC5408 /* TurnController.swift in Sources */,
 				B171222B2455E6C200DC5408 /* Serializer.swift in Sources */,
 				B1F4B14E2453D4EA005A1DC7 /* Board.swift in Sources */,
