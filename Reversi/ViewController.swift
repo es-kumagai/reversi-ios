@@ -50,8 +50,6 @@ class ViewController: UIViewController {
         
         if viewHasAppeared { return }
         viewHasAppeared = true
-        
-        gameController.waitForPlayer(afterDelay: 0)
     }
 }
 
@@ -130,7 +128,6 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [unowned self] _ in
 
             self.gameController.newGame()
-            self.gameController.waitForPlayer(afterDelay: 0)
             
             NotificationCenter.default.post(name: .ViewControllerReset, object: self)
         })
@@ -141,9 +138,9 @@ extension ViewController {
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
 
         let side: Disk = self.side(of: sender)
-        let player = Player(rawValue: sender.selectedSegmentIndex)!
+        let player = PlayerType(rawValue: sender.selectedSegmentIndex)!
         
-        gameController.changePlayer(player, of: side)        
+        gameController.changePlayer(player, of: side)
     }
 }
 
@@ -156,7 +153,7 @@ extension ViewController: BoardViewDelegate {
         // try? because doing nothing when an error occurs
         do {
             
-            try gameController.placeDisk(at: location, animated: true, switchToNextTurn: true)
+            try gameController.select(location, animated: true, switchToNextTurn: true)
         }
         catch _ {
             
@@ -197,7 +194,7 @@ extension ViewController : GameControllerDelegate {
         
         for side in Disk.sides {
             
-            playerControls[segmentIndex(of: side)].selectedSegmentIndex = players[of: side].rawValue
+            playerControls[segmentIndex(of: side)].selectedSegmentIndex = players[of: side].type.rawValue
         }
     }
     
@@ -215,12 +212,12 @@ extension ViewController : GameControllerDelegate {
         }
     }
 
-    func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk) {
+    func gameController(_ controller: GameController, thinkingWillStartBySide side: Disk) {
         
         playerActivityIndicators[segmentIndex(of: side)].startAnimating()
     }
     
-    func gameController(_ controller: GameController, ponderingDidEndBySide side: Disk) {
+    func gameController(_ controller: GameController, thinkingDidEndBySide side: Disk) {
         
         playerActivityIndicators[segmentIndex(of: side)].stopAnimating()
     }
@@ -240,7 +237,6 @@ extension ViewController : GameControllerDelegate {
         
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { _ in
             controller.nextTurn(withReason: .passed)
-            controller.waitForPlayer(afterDelay: 0)
         })
         
         present(alertController, animated: true)

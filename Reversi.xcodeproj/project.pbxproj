@@ -15,6 +15,11 @@
 		B171222B2455E6C200DC5408 /* Serializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222A2455E6C200DC5408 /* Serializer.swift */; };
 		B171222D2455E79200DC5408 /* Deserializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222C2455E79200DC5408 /* Deserializer.swift */; };
 		B171222F2455E96300DC5408 /* SerializationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B171222E2455E96300DC5408 /* SerializationError.swift */; };
+		B17CE426246AAF8600D55F56 /* PlayerControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17CE425246AAF8600D55F56 /* PlayerControllerDelegate.swift */; };
+		B17CE428246AB1EA00D55F56 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17CE427246AB1EA00D55F56 /* Player.swift */; };
+		B17CE42A246AB21100D55F56 /* PlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17CE429246AB21100D55F56 /* PlayerDelegate.swift */; };
+		B17CE42C246AB47A00D55F56 /* ManualPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17CE42B246AB47A00D55F56 /* ManualPlayer.swift */; };
+		B17CE42E246ACE6100D55F56 /* PlayerThoughtState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17CE42D246ACE6100D55F56 /* PlayerThoughtState.swift */; };
 		B1C4C58A24546A960004C2B7 /* TurnState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58924546A960004C2B7 /* TurnState.swift */; };
 		B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58B2454798F0004C2B7 /* PlayerController.swift */; };
 		B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C4C58D24547A2E0004C2B7 /* Players.swift */; };
@@ -23,7 +28,7 @@
 		B1DE08562453BCA700E4D54C /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1DE08552453BCA700E4D54C /* Direction.swift */; };
 		B1F4B1472453CAD3005A1DC7 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B1462453CAD3005A1DC7 /* GameController.swift */; };
 		B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */; };
-		B1F4B14C2453D43D005A1DC7 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B14B2453D43D005A1DC7 /* Player.swift */; };
+		B1F4B14C2453D43D005A1DC7 /* PlayerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B14B2453D43D005A1DC7 /* PlayerType.swift */; };
 		B1F4B14E2453D4EA005A1DC7 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B14D2453D4EA005A1DC7 /* Board.swift */; };
 		B1F4B1502453D86A005A1DC7 /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B14F2453D86A005A1DC7 /* Square.swift */; };
 		B1F4B1522453E52C005A1DC7 /* BoardViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F4B1512453E52C005A1DC7 /* BoardViewDelegate.swift */; };
@@ -62,6 +67,11 @@
 		B171222A2455E6C200DC5408 /* Serializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Serializer.swift; sourceTree = "<group>"; };
 		B171222C2455E79200DC5408 /* Deserializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deserializer.swift; sourceTree = "<group>"; };
 		B171222E2455E96300DC5408 /* SerializationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerializationError.swift; sourceTree = "<group>"; };
+		B17CE425246AAF8600D55F56 /* PlayerControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControllerDelegate.swift; sourceTree = "<group>"; };
+		B17CE427246AB1EA00D55F56 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		B17CE429246AB21100D55F56 /* PlayerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDelegate.swift; sourceTree = "<group>"; };
+		B17CE42B246AB47A00D55F56 /* ManualPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualPlayer.swift; sourceTree = "<group>"; };
+		B17CE42D246ACE6100D55F56 /* PlayerThoughtState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerThoughtState.swift; sourceTree = "<group>"; };
 		B1C4C58924546A960004C2B7 /* TurnState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnState.swift; sourceTree = "<group>"; };
 		B1C4C58B2454798F0004C2B7 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
 		B1C4C58D24547A2E0004C2B7 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
@@ -70,7 +80,7 @@
 		B1DE08552453BCA700E4D54C /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		B1F4B1462453CAD3005A1DC7 /* GameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
 		B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerPlayer.swift; sourceTree = "<group>"; };
-		B1F4B14B2453D43D005A1DC7 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		B1F4B14B2453D43D005A1DC7 /* PlayerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerType.swift; sourceTree = "<group>"; };
 		B1F4B14D2453D4EA005A1DC7 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		B1F4B14F2453D86A005A1DC7 /* Square.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Square.swift; sourceTree = "<group>"; };
 		B1F4B1512453E52C005A1DC7 /* BoardViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardViewDelegate.swift; sourceTree = "<group>"; };
@@ -130,6 +140,8 @@
 				B171221C2455087000DC5408 /* TurnController.swift */,
 				B1C4C58D24547A2E0004C2B7 /* Players.swift */,
 				B1C4C58B2454798F0004C2B7 /* PlayerController.swift */,
+				B17CE42D246ACE6100D55F56 /* PlayerThoughtState.swift */,
+				B17CE425246AAF8600D55F56 /* PlayerControllerDelegate.swift */,
 				B1712223245592DB00DC5408 /* FileController.swift */,
 				B1712225245592F900DC5408 /* ViewUpdateController.swift */,
 				DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */,
@@ -140,7 +152,10 @@
 		B1F4B1482453D3AD005A1DC7 /* Players */ = {
 			isa = PBXGroup;
 			children = (
-				B1F4B14B2453D43D005A1DC7 /* Player.swift */,
+				B17CE427246AB1EA00D55F56 /* Player.swift */,
+				B17CE429246AB21100D55F56 /* PlayerDelegate.swift */,
+				B1F4B14B2453D43D005A1DC7 /* PlayerType.swift */,
+				B17CE42B246AB47A00D55F56 /* ManualPlayer.swift */,
 				B1F4B1492453D3D6005A1DC7 /* ComputerPlayer.swift */,
 			);
 			name = Players;
@@ -321,25 +336,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B17CE42E246ACE6100D55F56 /* PlayerThoughtState.swift in Sources */,
 				D636B39F23D35043007F370F /* DiskView.swift in Sources */,
 				B1F4B1472453CAD3005A1DC7 /* GameController.swift in Sources */,
 				D642BDD623AA0B3900396732 /* CellView.swift in Sources */,
 				B1DE08542453B89C00E4D54C /* Location.swift in Sources */,
 				B1F4B156245438BF005A1DC7 /* ViewUpdateRequest.swift in Sources */,
-				B1F4B14C2453D43D005A1DC7 /* Player.swift in Sources */,
+				B1F4B14C2453D43D005A1DC7 /* PlayerType.swift in Sources */,
 				B17122212455868D00DC5408 /* SquareState.swift in Sources */,
 				B1C4C58C2454798F0004C2B7 /* PlayerController.swift in Sources */,
 				B171221F2455843000DC5408 /* GameRecord.swift in Sources */,
 				B1F4B1522453E52C005A1DC7 /* BoardViewDelegate.swift in Sources */,
+				B17CE42C246AB47A00D55F56 /* ManualPlayer.swift in Sources */,
 				B1712224245592DB00DC5408 /* FileController.swift in Sources */,
 				B1712226245592F900DC5408 /* ViewUpdateController.swift in Sources */,
 				B1F4B14A2453D3D6005A1DC7 /* ComputerPlayer.swift in Sources */,
 				B1C4C59024547EEC0004C2B7 /* GameControllerDelegate.swift in Sources */,
+				B17CE42A246AB21100D55F56 /* PlayerDelegate.swift in Sources */,
 				B171222F2455E96300DC5408 /* SerializationError.swift in Sources */,
 				B171221D2455087000DC5408 /* TurnController.swift in Sources */,
 				B171222B2455E6C200DC5408 /* Serializer.swift in Sources */,
 				B1F4B14E2453D4EA005A1DC7 /* Board.swift in Sources */,
+				B17CE426246AAF8600D55F56 /* PlayerControllerDelegate.swift in Sources */,
 				D642BDD823AA0B5700396732 /* Disk.swift in Sources */,
+				B17CE428246AB1EA00D55F56 /* Player.swift in Sources */,
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
 				D642BDDC23AA137C00396732 /* BoardView.swift in Sources */,
 				B1F4B1542454369A005A1DC7 /* Queue.swift in Sources */,

@@ -45,7 +45,7 @@ private extension Serializer {
         
         return Disk.sides.reduce("") { result, side in
             
-            return result + players[of: side].rawValue.description
+            return result + players[of: side].type.rawValue.description
         }
     }
     

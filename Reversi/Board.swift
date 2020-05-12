@@ -74,7 +74,6 @@ extension Board {
     }
     
     /// `location` で指定された升目に `disk` を設定します。
-    /// - Parameter disk: セルに設定される新しい状態です。 `nil` はディスクが置かれていない状態を表します。
     /// - Parameter location: セルの位置です。
     subscript(_ location: Location) -> Square.State {
         
@@ -125,6 +124,65 @@ extension Board {
     func contains(row: Int) -> Bool {
         
         return (0 ..< rows).contains(row)
+    }
+
+    /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
+    /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
+    func validMoves(for side: Disk) -> [Location] {
+        var locations: [Location] = []
+        
+        for square in squares {
+            if canPlaceDisk(side, at: square.location) {
+                locations.append(square.location)
+            }
+        }
+        
+        return locations
+    }
+
+    /// `location` で指定されたセルに、 `disk` が置けるかを調べます。
+    /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
+    /// - Parameter location: セルの位置です。
+    /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
+    func canPlaceDisk(_ disk: Disk, at location: Location) -> Bool {
+        !flipLocationsBy(disk, at: location).isEmpty
+    }
+
+    func flipLocationsBy(_ disk: Disk, at location: Location) -> [Location] {
+        
+        guard self[location] == .empty else {
+            return []
+        }
+        
+        var diskLocations: [Location] = []
+        
+        for direction in Direction.allDirections {
+            
+            var location = location
+            var diskLocationsInLine: [Location] = []
+            
+            flipping: while true {
+                
+                location = location.next(to: direction)
+                
+                guard contains(location) else {
+                    
+                    break flipping
+                }
+                
+                switch (disk, self[location]) { // Uses tuples to make patterns exhaustive
+                case (.dark, .dark), (.light, .light):
+                    diskLocations.append(contentsOf: diskLocationsInLine)
+                    break flipping
+                case (.dark, .light), (.light, .dark):
+                    diskLocationsInLine.append(location)
+                case (_, .empty):
+                    break flipping
+                }
+            }
+        }
+        
+        return diskLocations
     }
 }
 

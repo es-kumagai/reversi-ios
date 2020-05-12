@@ -2,27 +2,21 @@
 //  Player.swift
 //  Reversi
 //
-//  Created by Tomohiro Kumagai on 2020/04/25.
+//  Created by Tomohiro Kumagai on 2020/05/12.
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
-//protocol Player {
-//    
-//    func abortThinking()
-//}
+import Foundation
 
-enum Player: Int {
+@objc protocol Player : class {
     
-    case manual = 0
-    case computer = 1
-}
+    var type: PlayerType { get }
 
-extension Player {
+    weak var delegate: PlayerDelegate? { get }
+
+    func startThinking(withSide side: Disk, board: Board)
+    func stopThinking()
+    func select(location: Location)
     
-    /// 次の１手を返します。
-    /// - Returns: マニュアルの場合に nil を返します。
-    func ponderNextMove(handler: (Location?) -> Void) {
-        
-        
-    }
+    init(withDelegate delegate: PlayerDelegate?)
 }

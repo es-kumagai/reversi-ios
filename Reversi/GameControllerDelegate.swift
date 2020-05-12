@@ -10,8 +10,8 @@ import Foundation
 
 @objc protocol GameControllerDelegate : class {
     
-    func gameController(_ controller: GameController, ponderingWillStartBySide side: Disk)
-    func gameController(_ controller: GameController, ponderingDidEndBySide side: Disk)
+    func gameController(_ controller: GameController, thinkingWillStartBySide side: Disk)
+    func gameController(_ controller: GameController, thinkingDidEndBySide side: Disk)
     func gameController(_ controller: GameController, turnChanged side: Disk)
     func gameController(_ controller: GameController, cannotMoveAnyware side: Disk)
     func gameController(_ controller: GameController, gameOverWithWinner record: GameRecord, board: Board)
