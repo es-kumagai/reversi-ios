@@ -8,18 +8,25 @@
 
 import Foundation
 
+/// プレイヤーの種類です。
 @objc enum PlayerType: Int {
-    
+
     case manual = 0
     case computer = 1
 }
 
-extension PlayerType {
+extension PlayerType : CustomStringConvertible {
     
-    /// 次の１手を返します。
-    /// - Returns: マニュアルの場合に nil を返します。
-    func ponderNextMove(handler: (Location?) -> Void) {
+    /// プレイヤーの種類をテキスト表現に変換します。
+    var description: String {
         
-        
+        switch self {
+            
+        case .manual:
+            return "manual"
+            
+        case .computer:
+            return "computer"
+        }
     }
 }

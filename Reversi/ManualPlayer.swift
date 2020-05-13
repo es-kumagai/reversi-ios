@@ -29,6 +29,8 @@ class ManualPlayer : Player {
     
     func startThinking(withSide side: Disk, board: Board) {
         
+        delegate?.playerThinkingWillStartByItself(self)
+        
         if !board.nextMoveAvailable(on: side) {
             
             delegate?.player(self, thinkingDidEndByItself: PlayerThought(state: .passed))
@@ -37,5 +39,6 @@ class ManualPlayer : Player {
     
     func stopThinking() {
         
+        delegate?.player(self, thinkingDidEndByItself: PlayerThought(state: .aborted))
     }
 }

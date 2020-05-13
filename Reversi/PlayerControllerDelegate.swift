@@ -10,6 +10,6 @@ import Foundation
 
 @objc protocol PlayerControllerDelegate : class {
     
-    func playerController(_ controller: PlayerController, thinkingWillStartBySide side: Disk)
-    func playerController(_ controller: PlayerController, thinkingDidEndBySide side: Disk, thought: PlayerThought)
+    func playerController(_ controller: PlayerController, thinkingWillStartBySide side: Disk, player: Player)
+    func playerController(_ controller: PlayerController, thinkingDidEndBySide side: Disk, player: Player, thought: PlayerThought)
 }

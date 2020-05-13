@@ -73,21 +73,21 @@ extension PlayerController : PlayerDelegate {
 
     func playerThinkingWillStartByItself(_ player: Player) {
 
-        guard let player = side(of: player) else {
+        guard let side = self.side(of: player) else {
             
             return
         }
         
-        delegate?.playerController(self, thinkingWillStartBySide: player)
+        delegate?.playerController(self, thinkingWillStartBySide: side, player: player)
     }
     
     func player(_ player: Player, thinkingDidEndByItself thought: PlayerThought) {
 
-        guard let player = side(of: player) else {
+        guard let side = self.side(of: player) else {
             
             return
         }
         
-        delegate?.playerController(self, thinkingDidEndBySide: player, thought: thought)
+        delegate?.playerController(self, thinkingDidEndBySide: side, player: player, thought: thought)
     }
 }

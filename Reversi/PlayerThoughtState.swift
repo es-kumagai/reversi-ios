@@ -8,8 +8,24 @@
 
 import Foundation
 
+/// プレイヤーの考えを表現します。
 struct PlayerThought {
     
+    /// プレイヤーの考えです。
+    ///
+    /// 列挙型を Objective-C ブリッジすると、
+    /// コンパイラーが Segmentation Fault になるので、
+    /// 構造体に包んでいます。（ワークアラウンド）
+    ///
+    /// specified:
+    ///     升目を決定したことを示します。
+    /// moved:
+    ///     升目にディスクを置いたことを示します。
+    /// passed:
+    ///     自分の手番をパスしたことを示します。
+    ///
+    /// aborted:
+    ///     手版が中断されたことを示します。
     enum State {
         
         case specified(Location)
@@ -18,6 +34,7 @@ struct PlayerThought {
         case aborted
     }
     
+    /// プレイヤーの考えです。
     var state: State
 }
 

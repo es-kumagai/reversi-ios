@@ -130,6 +130,7 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [unowned self] _ in
 
             self.gameController.newGame()
+            self.gameController.startGame()
             
             NotificationCenter.default.post(name: .ViewControllerReset, object: self)
         })
@@ -214,12 +215,15 @@ extension ViewController : GameControllerDelegate {
         }
     }
 
-    func gameController(_ controller: GameController, thinkingWillStartBySide side: Disk) {
+    func gameController(_ controller: GameController, thinkingWillStartBySide side: Disk, player: Player) {
         
-        playerActivityIndicators[segmentIndex(of: side)].startAnimating()
+        if player.type == .computer {
+
+            playerActivityIndicators[segmentIndex(of: side)].startAnimating()
+        }
     }
     
-    func gameController(_ controller: GameController, thinkingDidEndBySide side: Disk) {
+    func gameController(_ controller: GameController, thinkingDidEndBySide side: Disk, player: Player) {
         
         playerActivityIndicators[segmentIndex(of: side)].stopAnimating()
     }

@@ -9,13 +9,16 @@
 import Foundation
 
 class ComputerPlayer : Player {
-
+    
+    /// 思考を進めている最中の時に `true`、そうでなければ `false` になります。
     private var isThinking = false
+    
+    /// 思考を行うスレッドです。
     private var thinkingQueue = DispatchQueue(label: "reversi.playercontroller.thinking")
     
     var type: PlayerType {
         
-        return .manual
+        return .computer
     }
     
     weak var delegate: PlayerDelegate?
@@ -65,6 +68,10 @@ class ComputerPlayer : Player {
 
 fileprivate extension ComputerPlayer {
     
+    /// 次の手番を考えます。
+    /// - Parameters:
+    ///   - side: 自分の手番の色です。
+    ///   - board: 現在の盤面です。
     func thinking(withSide side: Disk, board: Board) {
      
         Thread.sleep(forTimeInterval: 2)

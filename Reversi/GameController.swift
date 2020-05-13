@@ -10,6 +10,7 @@ import Foundation
 
 class GameController : NSObject {
     
+    /// ゲームの盤面です。
     private(set) var board = Board(cols: 8, rows: 8)
     
     /// 現在のターンでディスクを置いて良い状態であることを示します。アニメーションが終わる頃合いを待つのに使います。
@@ -23,6 +24,14 @@ class GameController : NSObject {
     @IBOutlet private var turnController: TurnController!
     @IBOutlet private var fileController: FileController!
     
+    /// ゲームを開始します。
+    func startGame() {
+        
+        allowPlacingOnThisTurn = true
+        playerController.startThinking()
+    }
+    
+    /// 新規ゲームを準備します。
     func newGame() {
         
         for side in Disk.sides {
@@ -31,16 +40,11 @@ class GameController : NSObject {
         }
         
         turnController.turnReset(with: .dark)
-        allowPlacingOnThisTurn = true
+        allowPlacingOnThisTurn = false
         
         board.reset()
         
         delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark, players: playerController.players)
-    }
-    
-    func startGame() {
-        
-        playerController.startThinking()
     }
     
     func changePlayer(_ player: PlayerType, of side: Disk) {
@@ -233,7 +237,7 @@ extension GameController {
         }
         
         allowPlacingOnThisTurn = false
-        
+
         let locations = [location] + flipLocations
         let duration = isAnimated ? animationDuration : 0
         
@@ -267,14 +271,14 @@ extension GameController {
 
 extension GameController : PlayerControllerDelegate {
     
-    func playerController(_ controller: PlayerController, thinkingWillStartBySide side: Disk) {
+    func playerController(_ controller: PlayerController, thinkingWillStartBySide side: Disk, player: Player) {
         
-        delegate?.gameController(self, thinkingWillStartBySide: side)
+        delegate?.gameController(self, thinkingWillStartBySide: side, player: player)
     }
 
-    func playerController(_ controller: PlayerController, thinkingDidEndBySide side: Disk, thought: PlayerThought) {
+    func playerController(_ controller: PlayerController, thinkingDidEndBySide side: Disk, player: Player, thought: PlayerThought) {
 
-        delegate?.gameController(self, thinkingDidEndBySide: side)
+        delegate?.gameController(self, thinkingDidEndBySide: side, player: player)
 
         do {
             
