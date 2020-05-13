@@ -50,6 +50,8 @@ class ViewController: UIViewController {
         
         if viewHasAppeared { return }
         viewHasAppeared = true
+        
+        gameController.startGame()
     }
 }
 

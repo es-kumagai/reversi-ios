@@ -36,7 +36,10 @@ class GameController : NSObject {
         board.reset()
         
         delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark, players: playerController.players)
-
+    }
+    
+    func startGame() {
+        
         playerController.startThinking()
     }
     
@@ -161,15 +164,7 @@ extension GameController {
             delegate?.gameController(self, gameDidStartWithBoard: board, turn: turnController.currentTurn!, players: playerController.players)
         }
     }
-        
-    /// `side` で指定した側が次の一手を持っているか調べます。
-    /// - Parameter side: 対象となる色です。
-    /// - Returns: 次の一手を打てる場合に `true` を、そうでなければ `false` を返します。
-    func nextMoveAvailable(on side: Disk) -> Bool {
-        
-        return !board.validMoves(for: side).isEmpty
-    }
-        
+                
     /// `side` で指定した側のプレイヤーを取得します。
     /// - Parameter side: 対象のディスクの色を指定します。
     /// - Returns: 該当するプレイヤーを取得します。
@@ -295,22 +290,15 @@ extension GameController : PlayerControllerDelegate {
                 
             case .passed:
                 
-                if nextMoveAvailable(on: side) {
+                if board.nextMoveAvailable(on: side.flipped) {
                     
-                    nextTurn(withReason: .passed)
+                    delegate?.gameController(self, cannotMoveAnyware: side)
                 }
                 else {
-                    
-                    if nextMoveAvailable(on: side.flipped) {
-                        
-                        delegate?.gameController(self, cannotMoveAnyware: side)
-                    }
-                    else {
-                        
-                        nextTurn(withReason: .passed)
-                    }
-                }
-                playerController.startThinking()
+
+                    nextTurn(withReason: .passed)
+                    playerController.startThinking()
+                }                
 
             case .aborted:
                 break

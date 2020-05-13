@@ -36,6 +36,12 @@ class ComputerPlayer : Player {
             return
         }
         
+        guard board.nextMoveAvailable(on: side) else {
+            
+            delegate?.player(self, thinkingDidEndByItself: PlayerThought(state: .passed))
+            return
+        }
+
         isThinking = true
         
         delegate?.playerThinkingWillStartByItself(self)

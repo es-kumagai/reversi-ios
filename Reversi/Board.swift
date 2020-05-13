@@ -139,6 +139,14 @@ extension Board {
         
         return locations
     }
+    
+    /// `side` で指定した側が次の一手を持っているか調べます。
+    /// - Parameter side: 対象となる色です。
+    /// - Returns: 次の一手を打てる場合に `true` を、そうでなければ `false` を返します。
+    func nextMoveAvailable(on side: Disk) -> Bool {
+        
+        return !validMoves(for: side).isEmpty
+    }
 
     /// `location` で指定されたセルに、 `disk` が置けるかを調べます。
     /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
