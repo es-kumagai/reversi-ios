@@ -27,11 +27,11 @@ class PlayerController: NSObject {
         players = Players(darkSide: darkSidePlayer, lightSide: lightSidePlayer)
     }
     
-    func changePlayer(of side: Disk, to player: PlayerMode) {
+    func changePlayerMode(of side: Disk, to mode: PlayerMode) {
         
         players[of: side].stopThinking()
 
-        switch player {
+        switch mode {
             
         case .manual:
             players[of: side] = ManualPlayer(withDelegate: self)

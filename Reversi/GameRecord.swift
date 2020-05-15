@@ -8,8 +8,10 @@
 
 import Foundation
 
+/// ゲームの勝敗状況を表現する型です。
 struct GameRecord {
     
+    /// ゲームの勝敗です。
     var winner: Disk?
 }
 

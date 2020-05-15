@@ -36,7 +36,7 @@ class GameController : NSObject {
         
         for side in Disk.sides {
             
-            playerController.changePlayer(of: side, to: .manual)
+            playerController.changePlayerMode(of: side, to: .manual)
         }
         
         turnController.turnReset(with: .dark)
@@ -47,32 +47,23 @@ class GameController : NSObject {
         delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark, players: playerController.players)
     }
     
-    func changePlayer(_ player: PlayerMode, of side: Disk) {
+    /// プレイヤーもーどを変更します。
+    /// - Parameters:
+    ///   - mode: 変更後のモードです。
+    ///   - side: 変更対象のプレイヤーを指定します。
+    func changePlayerMode(_ mode: PlayerMode, of side: Disk) {
         
-        playerController.changePlayer(of: side, to: player)
+        playerController.changePlayerMode(of: side, to: mode)
         try? saveGame()
         
         playerController.startThinking()
-    }
-    
-    /// `location` で指定された升目の `disk` を参照します。
-    /// - Parameter disk: 升目のディスクです。 `nil` はディスクが置かれていない状態を表します。
-    /// - Parameter location: セルの位置です。
-    func disk(at location: Location) -> Disk? {
-        
-        guard board.contains(location) else {
-            
-            fatalError("Location Out of Range: \(location)")
-        }
-        
-        return board[location].side
     }
     
     /// `location` で指定された升目に `disk` を設定します。
     /// - Parameter state: 升目に設定される新しい状態です。
     /// - Parameter location: セルの位置です。
     /// - Parameter animationDuration: アニメーション表示時の待ち時間です。
-    func set(_ state: Square.State, at location: Location, animationDuration duration: Double) {
+    private func set(_ state: Square.State, at location: Location, animationDuration duration: Double) {
         
         guard board.contains(location) else {
             
@@ -94,22 +85,14 @@ class GameController : NSObject {
     /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。
     func dominantSide() -> Disk? {
         
-        let darkCount = diskCount(of: .dark)
-        let lightCount = diskCount(of: .light)
+        let darkCount = board.count(of: .dark)
+        let lightCount = board.count(of: .light)
         
         if darkCount == lightCount {
             return nil
         } else {
             return darkCount > lightCount ? .dark : .light
         }
-    }
-    
-    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
-    /// - Parameter side: 数えるディスクの色です。
-    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
-    func diskCount(of side: Disk) -> Int {
-        
-        return board.count(of: side)
     }
 }
 
@@ -139,15 +122,15 @@ extension GameController {
             switch deserialized.turn {
                 
                 case .playing(side: let side):
-                    turnController.turnChange(to: side, reason: .resume)
+                    turnController.turnChange(to: side, reason: .initial)
                     
                 case .over:
                     turnController.turnReset()
             }
             
             // Players
-            playerController.changePlayer(of: .dark, to: deserialized.players.darkSide)
-            playerController.changePlayer(of: .light, to: deserialized.players.lightSide)
+            playerController.changePlayerMode(of: .dark, to: deserialized.players.darkSide)
+            playerController.changePlayerMode(of: .light, to: deserialized.players.lightSide)
 
             // Board
             board = deserialized.board
@@ -313,11 +296,3 @@ extension GameController : PlayerControllerDelegate {
         }
     }
 }
-
-// MARK: Additional types
-
-struct DiskPlacementError: Error {
-    let disk: Disk
-    let location: Location
-}
-

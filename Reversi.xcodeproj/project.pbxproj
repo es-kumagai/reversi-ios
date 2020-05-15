@@ -45,6 +45,7 @@
 		D642BDD623AA0B3900396732 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD523AA0B3900396732 /* CellView.swift */; };
 		D642BDD823AA0B5700396732 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
 		D642BDDC23AA137C00396732 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDDB23AA137C00396732 /* BoardView.swift */; };
+		DA6F5AA4246E8D1C00120F49 /* DiskPlacementError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6F5AA3246E8D1C00120F49 /* DiskPlacementError.swift */; };
 		DA89B23F2456C4D00014648A /* ViewUpdateControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -102,6 +103,7 @@
 		D642BDD723AA0B5700396732 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
 		D642BDDB23AA137C00396732 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		DA6F5AA124694AF400120F49 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		DA6F5AA3246E8D1C00120F49 /* DiskPlacementError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskPlacementError.swift; sourceTree = "<group>"; };
 		DA89B23E2456C4D00014648A /* ViewUpdateControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUpdateControllerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -194,6 +196,7 @@
 				B1F4B14F2453D86A005A1DC7 /* Square.swift */,
 				B1F4B1532454369A005A1DC7 /* Queue.swift */,
 				B1F4B155245438BF005A1DC7 /* ViewUpdateRequest.swift */,
+				DA6F5AA3246E8D1C00120F49 /* DiskPlacementError.swift */,
 			);
 			name = DataTypes;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				B1F4B1542454369A005A1DC7 /* Queue.swift in Sources */,
 				DA89B23F2456C4D00014648A /* ViewUpdateControllerDelegate.swift in Sources */,
 				B1F4B1502453D86A005A1DC7 /* Square.swift in Sources */,
+				DA6F5AA4246E8D1C00120F49 /* DiskPlacementError.swift in Sources */,
 				D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */,
 				B1C4C58E24547A2E0004C2B7 /* Players.swift in Sources */,
 				B171222D2455E79200DC5408 /* Deserializer.swift in Sources */,

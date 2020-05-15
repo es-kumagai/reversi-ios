@@ -143,7 +143,7 @@ extension ViewController {
         let side: Disk = self.side(of: sender)
         let mode = PlayerMode(rawValue: sender.selectedSegmentIndex)!
         
-        gameController.changePlayer(mode, of: side)
+        gameController.changePlayerMode(mode, of: side)
     }
 }
 
