@@ -9,13 +9,13 @@
 import Foundation
 
 /// プレイヤーの種類です。
-@objc enum PlayerType: Int {
+@objc enum PlayerMode: Int {
 
     case manual = 0
     case computer = 1
 }
 
-extension PlayerType : CustomStringConvertible {
+extension PlayerMode : CustomStringConvertible {
     
     /// プレイヤーの種類をテキスト表現に変換します。
     var description: String {

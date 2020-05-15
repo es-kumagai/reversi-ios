@@ -10,7 +10,7 @@ import Foundation
 
 enum Deserializer {
     
-    static func deserialization(_ string: String) throws -> (turn: TurnState, players: (darkSide: PlayerType, lightSide: PlayerType), board: Board) {
+    static func deserialization(_ string: String) throws -> (turn: TurnState, players: (darkSide: PlayerMode, lightSide: PlayerMode), board: Board) {
         
         let components = try self.components(from: string)
         
@@ -50,16 +50,16 @@ private extension Deserializer {
         return result
     }
     
-    static func deserialization(players string: String) throws -> (darkSide: PlayerType, lightSide: PlayerType) {
+    static func deserialization(players string: String) throws -> (darkSide: PlayerMode, lightSide: PlayerMode) {
         
         guard string.count == Disk.sides.count else {
             
             throw SerializationError.deserializationFailure("Invalid serialized players string: \(string)")
         }
         
-        let players = try zip(Disk.sides, string).map { (side, symbol) -> PlayerType in
+        let players = try zip(Disk.sides, string).map { (side, symbol) -> PlayerMode in
 
-            guard let symbolNumber = Int(symbol.description), let player = PlayerType(rawValue: symbolNumber) else {
+            guard let symbolNumber = Int(symbol.description), let player = PlayerMode(rawValue: symbolNumber) else {
                 
                 throw SerializationError.deserializationFailure("Invalid serialized player symbol: \(symbol)")
             }

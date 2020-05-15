@@ -10,7 +10,7 @@ import Foundation
 
 class ManualPlayer : Player {
 
-    var type: PlayerType {
+    var type: PlayerMode {
         
         return .manual
     }

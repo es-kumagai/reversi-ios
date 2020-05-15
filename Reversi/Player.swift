@@ -14,7 +14,7 @@ import Foundation
 @objc protocol Player : class {
     
     /// プレイヤーの種類を取得します。
-    var type: PlayerType { get }
+    var type: PlayerMode { get }
     
     /// プレイヤーが行動を起こしたことを通知するデリゲートです。
     weak var delegate: PlayerDelegate? { get }

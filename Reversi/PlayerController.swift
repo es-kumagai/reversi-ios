@@ -27,7 +27,7 @@ class PlayerController: NSObject {
         players = Players(darkSide: darkSidePlayer, lightSide: lightSidePlayer)
     }
     
-    func changePlayer(of side: Disk, to player: PlayerType) {
+    func changePlayer(of side: Disk, to player: PlayerMode) {
         
         players[of: side].stopThinking()
 

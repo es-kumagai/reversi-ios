@@ -47,7 +47,7 @@ class GameController : NSObject {
         delegate?.gameController(self, gameDidStartWithBoard: board, turn: .dark, players: playerController.players)
     }
     
-    func changePlayer(_ player: PlayerType, of side: Disk) {
+    func changePlayer(_ player: PlayerMode, of side: Disk) {
         
         playerController.changePlayer(of: side, to: player)
         try? saveGame()

@@ -141,9 +141,9 @@ extension ViewController {
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
 
         let side: Disk = self.side(of: sender)
-        let player = PlayerType(rawValue: sender.selectedSegmentIndex)!
+        let mode = PlayerMode(rawValue: sender.selectedSegmentIndex)!
         
-        gameController.changePlayer(player, of: side)
+        gameController.changePlayer(mode, of: side)
     }
 }
 

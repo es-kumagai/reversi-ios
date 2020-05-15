@@ -16,7 +16,7 @@ class ComputerPlayer : Player {
     /// 思考を行うスレッドです。
     private var thinkingQueue = DispatchQueue(label: "reversi.playercontroller.thinking")
     
-    var type: PlayerType {
+    var type: PlayerMode {
         
         return .computer
     }
