@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// 升目やディスクの位置を表現する型です。
 struct Location {
     
     var col: Int
@@ -16,6 +17,9 @@ struct Location {
 
 extension Location {
     
+    /// 現在位置から `direction` で指定された位置に移動した位置を取得します。
+    /// - Parameter direction: 移動する位置情報です。
+    /// - Returns: 移動後の位置を返します。
     func next(to direction: Direction) -> Location {
 
         var location = self

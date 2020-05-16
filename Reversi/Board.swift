@@ -8,13 +8,23 @@
 
 import Foundation
 
+/// ゲームで使う盤面です。
 struct Board {
     
+    /// 盤面の列数です。
     let cols: Int
+    
+    /// 盤面の行数です。
     let rows: Int
     
+    
+    /// 盤面の状態を配列で表現します。
     private(set) var squares: [Square]
     
+    /// 盤面を初期化します。
+    /// - Parameters:
+    ///   - cols: 盤面の列数です。
+    ///   - rows: 盤面の行数です。
     init(cols: Int, rows: Int) {
         
         self.cols = cols
@@ -34,6 +44,9 @@ struct Board {
 
 private extension Board {
     
+    /// 位置情報から、配列表現での升目のインデックスを取得します。
+    /// - Parameter location: 位置情報を指定します。
+    /// - Returns: 位置情報が該当する配列のインデックスを返します。
     func squareIndex(of location: Location) -> Int {
         
         return location.row * rows + location.col
@@ -155,7 +168,27 @@ extension Board {
     func canPlaceDisk(_ disk: Disk, at location: Location) -> Bool {
         !flipLocationsBy(disk, at: location).isEmpty
     }
-
+    
+    /// 移動可能な全方向を取得します。角は考慮しません。
+    var allDirections: [Direction] {
+        
+        return [
+            .leftTop,
+            .top,
+            .rightTop,
+            .right,
+            .rightBottom,
+            .bottom,
+            .leftBottom,
+            .left,
+        ]
+    }
+    
+    /// 裏返せるディスクの位置を取得します。
+    /// - Parameters:
+    ///   - disk: 裏返すのに使うディスクの面です。
+    ///   - location: ディスクを置く場所です。
+    /// - Returns: ディスクを置いたことによって裏返されるディスクを返します。
     func flipLocationsBy(_ disk: Disk, at location: Location) -> [Location] {
         
         guard self[location] == .empty else {
@@ -164,7 +197,7 @@ extension Board {
         
         var diskLocations: [Location] = []
         
-        for direction in Direction.allDirections {
+        for direction in allDirections {
             
             var location = location
             var diskLocationsInLine: [Location] = []

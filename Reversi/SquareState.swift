@@ -10,6 +10,10 @@ import Foundation
 
 extension Square {
     
+    /// 升目の状態です。
+    /// dark: 黒のディスクが置かれている
+    /// light: 白のディスクが置かれている
+    /// empty: ディスクが置かれていない
     @objc enum State : Int {
         
         case dark = 0
@@ -19,7 +23,9 @@ extension Square {
 }
 
 extension Square.State {
- 
+    
+    /// 升目のディスクの状態です。
+    /// ディスクが置かれていない場合は `nil` です。
     var side: Disk? {
         
         switch self {
@@ -38,6 +44,8 @@ extension Square.State {
 
 extension Square.State : CustomStringConvertible {
     
+    /// ディスクの状態から升目の状態に変換します。
+    /// - Parameter disk: ディスクの面です。`nil` の場合は「ディスクがない」ことを表現します。
     init(from disk: Disk?) {
         
         switch disk {
@@ -53,6 +61,8 @@ extension Square.State : CustomStringConvertible {
         }
     }
     
+    /// テキスト表現からの升目の状態を生成します。
+    /// - Parameter description: <#description description#>
     init?(description: String) {
         
         switch description {
@@ -71,6 +81,7 @@ extension Square.State : CustomStringConvertible {
         }
     }
     
+    /// 升目の状態をテキストで表現します。
     var description: String {
         
         switch self {

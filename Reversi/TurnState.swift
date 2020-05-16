@@ -6,6 +6,9 @@
 //  Copyright © 2020 Yuta Koshizawa. All rights reserved.
 //
 
+/// ターンの状態を表現する型です。
+/// playing:    ゲーム中であることを示します。`side` には現在の手番の色が入ります。
+/// over:       ゲームが終了していることを示します。
 enum TurnState {
     
     case playing(side: Disk)
@@ -14,6 +17,8 @@ enum TurnState {
 
 extension TurnState : CustomStringConvertible {
     
+    /// テキスト表現からターンの状態を生成します。
+    /// - Parameter description: ターンの状態を表現するテキストです。
         init?(description: String) {
             
             switch description {
@@ -31,7 +36,8 @@ extension TurnState : CustomStringConvertible {
                 return nil
             }
         }
-        
+    
+    /// ターンの状態をテキストで表現します。
         var description: String {
             
             switch self {

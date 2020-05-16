@@ -8,9 +8,13 @@
 
 import Foundation
 
+/// 升目を表現する型です。
 struct Square {
     
+    /// 升目の位置です。
     var location: Location
+    
+    /// 升目の状態です。
     var state: State = .empty
 }
 

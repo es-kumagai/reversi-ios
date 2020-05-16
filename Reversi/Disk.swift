@@ -1,5 +1,6 @@
 import Foundation
 
+/// ディスクの面を表現します。
 @objc public enum Disk : Int {
     case dark = 0
     case light = 1
