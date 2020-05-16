@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// 自動で手を打つプレイヤーです。
 class ComputerPlayer : Player {
     
     /// 思考を進めている最中の時に `true`、そうでなければ `false` になります。

@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// 手動操作でコントロールするプレイヤーです。
 class ManualPlayer : Player {
 
     var type: PlayerMode {
